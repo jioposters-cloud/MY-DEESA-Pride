@@ -27,6 +27,7 @@ export default function App() {
       case 'property':
       case 'jobs':
       case 'food':
+      case 'realestate':
         return <DirectoryList screen={currentScreen} onBack={() => setCurrentScreen('dashboard')} />;
       case 'weather':
         return (

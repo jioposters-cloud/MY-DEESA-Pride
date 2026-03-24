@@ -27,11 +27,12 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
       // Filter based on screen
       const filtered = data.filter(item => {
         const cat = item.category.toLowerCase();
-        if (screen === 'phonebook') return cat.includes('doctor') || cat.includes('service') || cat.includes('directory');
+        if (screen === 'phonebook') return true; // Show all for phonebook but we will categorize it
         if (screen === 'rental') return cat.includes('rental');
         if (screen === 'property') return cat.includes('property');
         if (screen === 'jobs') return cat.includes('job');
         if (screen === 'food') return cat.includes('food') || cat.includes('restaurant');
+        if (screen === 'realestate') return cat.includes('real estate') || cat.includes('scheme');
         return true;
       });
       
@@ -41,13 +42,43 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
     loadData();
   }, [screen]);
 
-  const filteredItems = items.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.subCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.info.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const categories = useMemo(() => {
+    const cats = Array.from(new Set(items.map(item => item.category)));
+    return cats.sort();
+  }, [items]);
 
-  const title = screen.charAt(0).toUpperCase() + screen.slice(1);
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeSubCategory, setActiveSubCategory] = useState<string>('All');
+
+  useEffect(() => {
+    if (categories.length > 0 && !activeCategory) {
+      setActiveCategory(categories[0]);
+    }
+  }, [categories, activeCategory]);
+
+  const subCategories = useMemo(() => {
+    if (!activeCategory) return ['All'];
+    const subs = Array.from(new Set(
+      items
+        .filter(item => item.category === activeCategory)
+        .map(item => item.subCategory)
+    ));
+    return ['All', ...subs.sort()];
+  }, [items, activeCategory]);
+
+  const filteredItems = items.filter(item => {
+    const matchesSearch = 
+      item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.subCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.info.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = !activeCategory || item.category === activeCategory;
+    const matchesSubCategory = activeSubCategory === 'All' || item.subCategory === activeSubCategory;
+
+    return matchesSearch && matchesCategory && matchesSubCategory;
+  });
+
+  const title = screen === 'phonebook' ? 'Phonebook - MyDeesa App Diary' : screen.charAt(0).toUpperCase() + screen.slice(1);
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] pb-10">
@@ -57,21 +88,77 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
           <button onClick={onBack} className="text-[#b71700] p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-xl font-black tracking-tighter text-[#b71700] flex-1">{title}</h1>
+          <h1 className="text-xl font-black tracking-tighter text-[#b71700] flex-1 uppercase">{title}</h1>
         </div>
       </header>
 
       <main className="pt-20 px-4 max-w-5xl mx-auto space-y-6">
         {/* Search */}
-        <div className="bg-white rounded-2xl shadow-sm flex items-center px-5 py-3 gap-3 ring-1 ring-black/5">
+        <div className="bg-white rounded-full shadow-sm flex items-center px-5 py-4 gap-3 ring-1 ring-black/5">
           <Search className="w-5 h-5 text-gray-400" />
           <input 
             className="w-full bg-transparent border-none focus:ring-0 text-gray-900 placeholder-gray-400" 
-            placeholder={`Search ${screen}...`} 
+            placeholder={`Search in ${screen}...`} 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+
+        {/* Categories Horizontal Scroll */}
+        {categories.length > 1 && (
+          <section className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-sm font-black text-[#b71700] tracking-widest uppercase">Explore Categories</h2>
+              <button className="text-[10px] font-bold text-red-500 uppercase tracking-widest">View All &gt;</button>
+            </div>
+            <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setActiveSubCategory('All');
+                  }}
+                  className="flex flex-col items-center gap-2 flex-shrink-0 group"
+                >
+                  <div className={cn(
+                    "w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black transition-all shadow-sm ring-2 ring-transparent",
+                    activeCategory === cat ? "bg-[#fedf36] text-[#211b00] ring-[#fedf36]" : "bg-[#2d5a44] text-white"
+                  )}>
+                    {cat.charAt(0).toUpperCase()}
+                  </div>
+                  <span className={cn(
+                    "text-[10px] font-bold text-center max-w-[80px] leading-tight uppercase tracking-tighter",
+                    activeCategory === cat ? "text-gray-900" : "text-gray-500"
+                  )}>{cat}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Subcategories Pills */}
+        {activeCategory && subCategories.length > 1 && (
+          <section className="space-y-4">
+            <h2 className="text-sm font-black text-[#b71700] tracking-widest uppercase">{activeCategory}</h2>
+            <div className="flex flex-wrap gap-2">
+              {subCategories.map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => setActiveSubCategory(sub)}
+                  className={cn(
+                    "px-4 py-2 rounded-full text-xs font-bold transition-all border",
+                    activeSubCategory === sub 
+                      ? "bg-[#2d3436] text-white border-[#2d3436]" 
+                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
+                  )}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">

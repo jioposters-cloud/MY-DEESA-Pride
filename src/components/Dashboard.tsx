@@ -16,6 +16,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'phonebook', name: 'Phonebook', icon: Contact, color: 'bg-red-50 text-[#b71700]', screen: 'phonebook' },
     { id: 'rental', name: 'Rental', icon: Key, color: 'bg-yellow-50 text-[#6d5e00]', screen: 'rental' },
     { id: 'property', name: 'Property', icon: Building2, color: 'bg-blue-50 text-blue-700', screen: 'property' },
+    { id: 'realestate', name: 'Real Estate Schemes', icon: Home, color: 'bg-indigo-50 text-indigo-700', screen: 'realestate' },
     { id: 'jobs', name: 'Job Vacancies', icon: Briefcase, color: 'bg-green-50 text-emerald-700', screen: 'jobs' },
     { id: 'food', name: 'Food', icon: Utensils, color: 'bg-orange-50 text-orange-700', screen: 'food' },
     { id: 'explore', name: 'Explore City', icon: Compass, color: 'bg-purple-50 text-purple-700', screen: 'dashboard' },
@@ -49,11 +50,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </span>
           <div className="whitespace-nowrap overflow-hidden">
             <motion.p 
-              animate={{ x: [0, -400] }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              animate={{ x: [0, -1500] }}
+              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
               className="text-sm font-medium"
             >
-              New APMC Rates Updated • Local Festival in Market Square • Weather: Clear Sky 28°C • Property Listings Updated
+              APMC Rates (21/03/2026): Castor 1295-1308 • Mustard 1175-1371 • Bajri 400-514 • Wheat 421-585 • Rajgaro 1600-1930 • Cumin 3600-4301 • Chana 1000-1016 • V.J. Patel Market: Potato 50-135 • Onion 200-330 • Apple 1800-2440 • Weather: Clear Sky 28°C, Humidity 45%, Wind 10 km/h NW • No significant weather warnings.
             </motion.p>
           </div>
         </section>

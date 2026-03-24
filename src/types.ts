@@ -13,4 +13,4 @@ export interface DirectoryItem {
   mapPin: string;
 }
 
-export type Screen = 'welcome' | 'dashboard' | 'phonebook' | 'rental' | 'property' | 'jobs' | 'food' | 'weather' | 'apmc' | 'shopping';
+export type Screen = 'welcome' | 'dashboard' | 'phonebook' | 'rental' | 'property' | 'jobs' | 'food' | 'weather' | 'apmc' | 'shopping' | 'realestate';
