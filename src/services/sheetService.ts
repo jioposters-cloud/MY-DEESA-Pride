@@ -21,12 +21,12 @@ export async function fetchDirectoryData(): Promise<DirectoryItem[]> {
             location: row['Location'] || '',
             website: row['Website'] || '',
             whatsapp: row['WhatsApp'] || '',
-            images: [row['image 1'], row['image 2'], row['image 3']].filter(Boolean),
+            images: [row['image 1'], row['image 2'], row['image 3']].filter(img => img && typeof img === 'string' && img.startsWith('http')),
             verified: String(row['Verified'] || '').toLowerCase().includes('verified'),
             info: row['info'] || '',
             tag: row['Tag'] || '',
             mapPin: row['Map pin'] || '',
-          })).filter(item => item.name && !item.name.includes('eleNAM') && !item.name.includes('compNAM')); // Filter out markers from the sheet
+          })).filter(item => item.name && !item.name.includes('NAMSt') && !item.name.includes('NUMSt') && !item.name.includes('NAMEnd') && !item.name.includes('NUMEnd'));
           
           resolve(items);
         },

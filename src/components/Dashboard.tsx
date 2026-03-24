@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { 
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
   ShoppingBag, Home, LayoutGrid, User, Plus
 } from 'lucide-react';
-import { Screen } from '../types';
+import { DirectoryItem, Screen } from '../types';
+import { fetchDirectoryData } from '../services/sheetService';
 
 interface DashboardProps {
   onNavigate: (screen: Screen) => void;
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
+  const [featuredItems, setFeaturedItems] = useState<DirectoryItem[]>([]);
+
+  useEffect(() => {
+    async function loadFeatured() {
+      const data = await fetchDirectoryData();
+      const featured = data.filter(item => item.category === 'Featured Spotlights');
+      setFeaturedItems(featured);
+    }
+    loadFeatured();
+  }, []);
+
   const categories = [
     { id: 'phonebook', name: 'Phonebook', icon: Contact, color: 'bg-red-50 text-[#b71700]', screen: 'phonebook' },
     { id: 'rental', name: 'Rental', icon: Key, color: 'bg-yellow-50 text-[#6d5e00]', screen: 'rental' },
@@ -98,20 +110,36 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             Featured Spotlights
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FeaturedCard 
-              title="Hotel Royal Deesa" 
-              subtitle="Best luxury stay experience" 
-              tag="HOT DEAL" 
-              image="https://picsum.photos/seed/hotel/800/600"
-              tagColor="bg-[#fedf36] text-[#211b00]"
-            />
-            <FeaturedCard 
-              title="Central Market Food Court" 
-              subtitle="Explore local delicacies" 
-              tag="NEW ENTRY" 
-              image="https://picsum.photos/seed/market/800/600"
-              tagColor="bg-[#b71700] text-white"
-            />
+            {featuredItems.length > 0 ? (
+              featuredItems.map((item, idx) => (
+                <FeaturedCard 
+                  key={idx}
+                  title={item.name} 
+                  subtitle={item.info} 
+                  tag={item.tag} 
+                  image={item.images[0] || "https://picsum.photos/seed/featured/800/600"}
+                  tagColor={idx % 2 === 0 ? "bg-[#fedf36] text-[#211b00]" : "bg-[#b71700] text-white"}
+                  url={item.website}
+                />
+              ))
+            ) : (
+              <>
+                <FeaturedCard 
+                  title="Hotel Royal Deesa" 
+                  subtitle="Best luxury stay experience" 
+                  tag="HOT DEAL" 
+                  image="https://picsum.photos/seed/hotel/800/600"
+                  tagColor="bg-[#fedf36] text-[#211b00]"
+                />
+                <FeaturedCard 
+                  title="Central Market Food Court" 
+                  subtitle="Explore local delicacies" 
+                  tag="NEW ENTRY" 
+                  image="https://picsum.photos/seed/market/800/600"
+                  tagColor="bg-[#b71700] text-white"
+                />
+              </>
+            )}
           </div>
         </section>
       </main>
@@ -133,8 +161,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   );
 }
 
-function FeaturedCard({ title, subtitle, tag, image, tagColor }: any) {
-  return (
+function FeaturedCard({ title, subtitle, tag, image, tagColor, url }: any) {
+  const content = (
     <div className="relative h-48 rounded-2xl overflow-hidden group cursor-pointer">
       <img 
         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
@@ -143,12 +171,22 @@ function FeaturedCard({ title, subtitle, tag, image, tagColor }: any) {
         referrerPolicy="no-referrer"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-end p-4">
-        <span className={`${tagColor} text-[10px] font-bold px-2 py-0.5 rounded-full w-fit mb-2`}>{tag}</span>
+        {tag && <span className={`${tagColor} text-[10px] font-bold px-2 py-0.5 rounded-full w-fit mb-2`}>{tag}</span>}
         <h3 className="text-white font-bold text-lg">{title}</h3>
         <p className="text-white/80 text-xs">{subtitle}</p>
       </div>
     </div>
   );
+
+  if (url) {
+    return (
+      <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+        {content}
+      </a>
+    );
+  }
+
+  return content;
 }
 
 function NavItem({ icon: Icon, label, active = false, onClick }: any) {
