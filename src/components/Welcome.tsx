@@ -64,22 +64,13 @@ export default function Welcome({ onExplore }: WelcomeProps) {
 
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#fedf36] animate-pulse"></span>
-            <span className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest">System Ready</span>
+            <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center max-w-[300px] leading-relaxed">
+              Brought to you by Dr.Ankit M.Patel | IMAX DENTAL 3D LAB, Managed by Team MyDeesa
+            </span>
           </div>
         </div>
       </motion.div>
 
-      {/* Footer */}
-      <footer className="absolute bottom-12 left-0 w-full px-8 flex justify-between items-center text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
-        <div className="flex gap-4">
-          <span>Privacy</span>
-          <span>Terms</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-1 h-1 bg-[#b71700] rounded-full"></span>
-          <span>Deesa Modern v2.0</span>
-        </div>
-      </footer>
 
       {/* Floating Accent Cards (Desktop Only) */}
       <div className="fixed top-24 -right-12 hidden lg:block">

@@ -33,7 +33,7 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
         if (screen === 'property') return cat.includes('property');
         if (screen === 'jobs') return cat.includes('job');
         if (screen === 'food') return cat.includes('food') || cat.includes('restaurant');
-        if (screen === 'realestate') return cat.includes('real estate') || cat.includes('scheme');
+        if (screen === 'realestate') return cat.includes('real estate schemes');
         return true;
       });
       
@@ -79,7 +79,9 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
     return matchesSearch && matchesCategory && matchesSubCategory;
   });
 
-  const title = screen === 'phonebook' ? 'Phonebook - MyDeesa App Diary' : screen.charAt(0).toUpperCase() + screen.slice(1);
+  const title = screen === 'phonebook' ? 'Phonebook - MyDeesa App Diary' : 
+                screen === 'realestate' ? 'Real Estate Schemes' :
+                screen.charAt(0).toUpperCase() + screen.slice(1);
 
   return (
     <div className="min-h-screen bg-[#fdfbf7] pb-10">
