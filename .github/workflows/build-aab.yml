@@ -1,9 +1,1 @@
-name: Build AAB
-on: [workflow_dispatch, push]
-jobs:
-  build:
-      runs-on: ubuntu-latest
-          steps:
-                - uses: actions/checkout@v4
-                      - run: echo "Test"
-                      
+{ "name": "Build AAB", "on": ["workflow_dispatch", "push"], "jobs": { "build": { "runs-on": "ubuntu-latest", "steps": [{ "uses": "actions/checkout@v4" }, { "run": "echo Test" }] } } }
