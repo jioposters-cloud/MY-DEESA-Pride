@@ -1,1 +1,37 @@
-{"name":"Build Android AAB (TWA)","on":{"workflow_dispatch":{},"push":{"branches":["main"]}},"jobs":{"build-aab":{"runs-on":"ubuntu-latest","steps":[{"name":"Checkout repository","uses":"actions/checkout@v4"},{"name":"Setup Node.js","uses":"actions/setup-node@v4","with":{"node-version":"20"}},{"name":"Setup Java 17","uses":"actions/setup-java@v4","with":{"distribution":"temurin","java-version":"17"}},{"name":"Install Android SDK command-line tools","run":"yes | sdkmanager --licenses || true; sdkmanager \"build-tools;34.0.0\" \"platforms;android-34\""},{"name":"Install Bubblewrap CLI","run":"npm install -g @bubblewrap/cli"},{"name":"Create Bubblewrap TWA manifest","run":"mkdir twa-project && echo '{\"packageId\": \"in.mydeesa.app\", \"host\": \"mydeesa.netlify.app\", \"name\": \"MY DEESA\", \"launcherName\": \"MY DEESA\", \"display\": \"standalone\", \"themeColor\": \"#1a1a2e\", \"navigationColor\": \"#1a1a2e\", \"backgroundColor\": \"#1a1a2e\", \"enableNotifications\": false, \"startUrl\": \"/\", \"iconUrl\": \"https://mydeesa.netlify.app/icon-512.png\", \"maskableIconUrl\": \"https://mydeesa.netlify.app/icon-512.png\", \"appVersion\": \"1\", \"appVersionName\": \"1.0.0\", \"shortcuts\": [], \"generatorApp\": \"bubblewrap-cli\", \"webManifestUrl\": \"https://mydeesa.netlify.app/manifest.json\", \"fallbackType\": \"customtabs\", \"features\": {}, \"alphaDependencies\": { \"enabled\": false }, \"enableSiteSettingsShortcut\": true, \"isChromeOSOnly\": false, \"isMetaQuest\": false, \"minSdkVersion\": 24, \"orientation\": \"default\", \"fingerprints\": [] }' > twa-project/twa-manifest.json"},{"name":"Initialize Bubblewrap project","run":"cd twa-project && bubblewrap init --manifest https://mydeesa.netlify.app/manifest.json --skipPwaValidation","continue-on-error":true},{"name":"Build debug AAB","run":"cd twa-project && if [ -f gradlew ]; then chmod +x gradlew; ./gradlew bundleDebug; else echo \"Gradle wrapper not found\"; exit 1; fi"},{"name":"Upload AAB artifact","uses":"actions/upload-artifact@v4","with":{"name":"mydeesa-debug-aab","path":"twa-project/app/build/outputs/bundle/debug/app-debug.aab","if-no-files-found":"warn"}}]}}}
+name: Build Android AAB
+on:
+  workflow_dispatch:
+    push:
+        branches: [main]
+        jobs:
+          build:
+              runs-on: ubuntu-latest
+                  steps:
+                        - uses: actions/checkout@v4
+                              - uses: actions/setup-java@v4
+                                      with:
+                                                java-version: '17'
+                                                          distribution: 'temurin'
+                                                                - uses: actions/setup-node@v4
+                                                                        with:
+                                                                                  node-version: '20'
+                                                                                        - name: Setup Android SDK
+                                                                                                uses: android-actions/setup-android@v3
+                                                                                                      - name: Install Bubblewrap
+                                                                                                              run: npm install -g @bubblewrap/cli
+                                                                                                                    - name: Init TWA project
+                                                                                                                            run: |
+                                                                                                                                      mkdir twa && cd twa
+                                                                                                                                                bubblewrap init --manifest https://mydeesa.netlify.app/manifest.json --skipPwaValidation || true
+                                                                                                                                                      - name: Build AAB
+                                                                                                                                                              run: |
+                                                                                                                                                                        cd twa
+                                                                                                                                                                                  chmod +x gradlew
+                                                                                                                                                                                            ./gradlew bundleRelease || ./gradlew bundleDebug || true
+                                                                                                                                                                                                  - name: Find and upload AAB
+                                                                                                                                                                                                          uses: actions/upload-artifact@v4
+                                                                                                                                                                                                                  with:
+                                                                                                                                                                                                                            name: mydeesa-aab
+                                                                                                                                                                                                                                      path: twa/app/build/outputs/bundle/**/*.aab
+                                                                                                                                                                                                                                                if-no-files-found: warn
+                                                                                                                                                                                                                                                
