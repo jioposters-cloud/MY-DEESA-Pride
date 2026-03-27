@@ -1,0 +1,33 @@
+name: Build Android AAB
+on:
+  workflow_dispatch:
+    push:
+        branches: [main]
+        jobs:
+          build:
+              runs-on: ubuntu-latest
+                  steps:
+                        - uses: actions/checkout@v4
+                              - uses: actions/setup-java@v4
+                                      with:
+                                                java-version: '17'
+                                                          distribution: 'temurin'
+                                                                - uses: actions/setup-node@v4
+                                                                        with:
+                                                                                  node-version: '20'
+                                                                                        - name: Setup Android SDK
+                                                                                                uses: android-actions/setup-android@v3
+                                                                                                      - name: Install Bubblewrap
+                                                                                                              run: npm install -g @bubblewrap/cli
+                                                                                                                    - name: Build TWA
+                                                                                                                            run: |
+                                                                                                                                      mkdir twa && cd twa
+                                                                                                                                                bubblewrap init --manifest https://mydeesa.netlify.app/manifest.json --skipPwaValidation || true
+                                                                                                                                                          if [ -f gradlew ]; then chmod +x gradlew && ./gradlew bundleDebug || true; fi
+                                                                                                                                                                - name: Upload AAB
+                                                                                                                                                                        uses: actions/upload-artifact@v4
+                                                                                                                                                                                with:
+                                                                                                                                                                                          name: mydeesa-aab
+                                                                                                                                                                                                    path: twa/app/build/outputs/bundle/**/*.aab
+                                                                                                                                                                                                              if-no-files-found: warn
+                                                                                                                                                                                                              
