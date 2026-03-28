@@ -33,7 +33,7 @@ export default function App() {
         return (
           <ExternalView 
             title="Weather" 
-            url="https://www.mydeesa.in/2016/02/weather.html" 
+            url="https://city.imd.gov.in/citywx/city_weather_test_try_warnings.php?id=42539" 
             onBack={() => setCurrentScreen('dashboard')} 
           />
         );
@@ -41,7 +41,7 @@ export default function App() {
         return (
           <ExternalView 
             title="APMC Rates" 
-            url="https://www.mydeesa.in/2016/02/apmc.html" 
+            url="https://apmcdeesa.com" 
             onBack={() => setCurrentScreen('dashboard')} 
           />
         );
@@ -49,7 +49,7 @@ export default function App() {
         return (
           <ExternalView 
             title="Shopping" 
-            url="https://statusring.in" 
+            url="https://mydeesa.statusring.in" 
             onBack={() => setCurrentScreen('dashboard')} 
           />
         );

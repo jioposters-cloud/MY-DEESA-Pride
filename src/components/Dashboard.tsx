@@ -32,10 +32,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'jobs', name: 'Job Vacancies', icon: Briefcase, color: 'bg-green-50 text-emerald-700', screen: 'jobs' },
     { id: 'food', name: 'Food', icon: Utensils, color: 'bg-orange-50 text-orange-700', screen: 'food' },
     { id: 'explore', name: 'Explore City', icon: Compass, color: 'bg-purple-50 text-purple-700', screen: 'dashboard' },
-    { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
-    { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
+    { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', url: 'https://city.imd.gov.in/citywx/city_weather_test_try_warnings.php?id=42539' },
+    { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', url: 'https://apmcdeesa.com' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
   ];
+
+  const handleCategoryClick = (cat: any) => {
+    if (cat.url) {
+      window.open(cat.url, '_blank');
+    } else {
+      onNavigate(cat.screen as Screen);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] pb-28">
@@ -92,7 +100,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             <motion.button
               key={cat.id}
               whileTap={{ scale: 0.95 }}
-              onClick={() => onNavigate(cat.screen as Screen)}
+              onClick={() => handleCategoryClick(cat)}
               className="flex flex-col items-center gap-3 group"
             >
               <div className={`w-20 h-20 ${cat.color} rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm`}>
