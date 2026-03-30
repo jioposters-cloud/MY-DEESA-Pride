@@ -14,35 +14,59 @@ export default function App() {
       appId: 'd45b951e-1fb2-4bf8-91e6-530e0392aa9c',
       allowLocalhostAsSecureOrigin: true,
     });
+
+    // Initialize history state
+    window.history.replaceState({ screen: 'welcome' }, '');
+
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.screen) {
+        setCurrentScreen(event.state.screen);
+      } else {
+        setCurrentScreen('welcome');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  const navigateTo = (screen: Screen) => {
+    if (screen === currentScreen) return;
+    setCurrentScreen(screen);
+    window.history.pushState({ screen }, '');
+  };
+
+  const goBack = () => {
+    window.history.back();
+  };
 
   const renderScreen = () => {
     switch (currentScreen) {
       case 'welcome':
-        return <Welcome onExplore={() => setCurrentScreen('dashboard')} />;
+        return <Welcome onExplore={() => navigateTo('dashboard')} />;
       case 'dashboard':
-        return <Dashboard onNavigate={setCurrentScreen} />;
+        return <Dashboard onNavigate={navigateTo} />;
       case 'phonebook':
       case 'rental':
       case 'property':
       case 'jobs':
       case 'food':
       case 'realestate':
-        return <DirectoryList screen={currentScreen} onBack={() => setCurrentScreen('dashboard')} />;
+        return <DirectoryList screen={currentScreen} onBack={goBack} />;
       case 'weather':
         return (
           <ExternalView 
             title="Weather" 
-            url="https://city.imd.gov.in/citywx/city_weather_test_try_warnings.php?id=42539" 
-            onBack={() => setCurrentScreen('dashboard')} 
+            url="https://www.mydeesa.in/2016/02/weather.html" 
+            onBack={goBack} 
           />
         );
       case 'apmc':
         return (
           <ExternalView 
             title="APMC Rates" 
-            url="https://apmcdeesa.com" 
-            onBack={() => setCurrentScreen('dashboard')} 
+            url="https://www.mydeesa.in/2016/02/apmc.html" 
+            onBack={goBack} 
           />
         );
       case 'shopping':
@@ -50,11 +74,11 @@ export default function App() {
           <ExternalView 
             title="Shopping" 
             url="https://mydeesa.statusring.in" 
-            onBack={() => setCurrentScreen('dashboard')} 
+            onBack={goBack} 
           />
         );
       default:
-        return <Dashboard onNavigate={setCurrentScreen} />;
+        return <Dashboard onNavigate={navigateTo} />;
     }
   };
 

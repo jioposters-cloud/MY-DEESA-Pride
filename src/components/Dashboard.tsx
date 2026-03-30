@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
-  ShoppingBag, Home, LayoutGrid, User, Plus
+  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
@@ -14,6 +14,7 @@ interface DashboardProps {
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const [featuredItems, setFeaturedItems] = useState<DirectoryItem[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     async function loadFeatured() {
@@ -32,8 +33,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'jobs', name: 'Job Vacancies', icon: Briefcase, color: 'bg-green-50 text-emerald-700', screen: 'jobs' },
     { id: 'food', name: 'Food', icon: Utensils, color: 'bg-orange-50 text-orange-700', screen: 'food' },
     { id: 'explore', name: 'Explore City', icon: Compass, color: 'bg-purple-50 text-purple-700', screen: 'dashboard' },
-    { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', url: 'https://city.imd.gov.in/citywx/city_weather_test_try_warnings.php?id=42539' },
-    { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', url: 'https://apmcdeesa.com' },
+    { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
+    { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
   ];
 
@@ -47,11 +48,81 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] pb-28">
+      {/* Sidebar Overlay */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
+            />
+            <motion.div 
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed inset-y-0 left-0 w-[280px] bg-white z-[70] shadow-2xl flex flex-col"
+            >
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#b71700] text-white">
+                <div>
+                  <h2 className="text-2xl font-black tracking-tighter">MyDeesa</h2>
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Digital Concierge</p>
+                </div>
+                <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
+                <SidebarItem 
+                  icon={Globe} 
+                  label="Explore MyDeesa" 
+                  onClick={() => window.open('https://www.mydeesa.in/', '_blank')}
+                  active
+                />
+                <SidebarItem 
+                  icon={LayoutGrid} 
+                  label="All Services" 
+                  onClick={() => { onNavigate('dashboard'); setIsSidebarOpen(false); }}
+                />
+                <SidebarItem 
+                  icon={Briefcase} 
+                  label="Job Vacancies" 
+                  onClick={() => { onNavigate('jobs'); setIsSidebarOpen(false); }}
+                />
+                <SidebarItem 
+                  icon={Home} 
+                  label="Real Estate" 
+                  onClick={() => { onNavigate('realestate'); setIsSidebarOpen(false); }}
+                />
+                <div className="pt-6 mt-6 border-t border-gray-100">
+                  <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Support & Info</p>
+                  <SidebarItem icon={Phone} label="Contact Us" onClick={() => {}} />
+                  <SidebarItem icon={Mail} label="Email Support" onClick={() => {}} />
+                </div>
+              </div>
+
+              <div className="p-6 border-t border-gray-100 bg-gray-50">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
+                  Brought to you by Dr.Ankit M.Patel | IMAX DENTAL 3D LAB
+                </p>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-xl shadow-sm">
         <div className="flex justify-between items-center px-6 h-16 max-w-5xl mx-auto">
           <div className="flex items-center gap-4">
-            <button className="text-[#b71700] p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="text-[#b71700] p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <Menu className="w-6 h-6" />
             </button>
             <h1 className="text-xl font-black tracking-tighter text-[#b71700]">MyDeesa</h1>
@@ -166,6 +237,22 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         <Plus className="w-8 h-8" />
       </button>
     </div>
+  );
+}
+
+function SidebarItem({ icon: Icon, label, onClick, active = false }: any) {
+  return (
+    <button 
+      onClick={onClick}
+      className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
+        active 
+          ? 'bg-red-50 text-[#b71700] shadow-sm' 
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      }`}
+    >
+      <Icon className={`w-5 h-5 ${active ? 'text-[#b71700]' : 'text-gray-400'}`} />
+      <span className="text-sm font-bold tracking-tight">{label}</span>
+    </button>
   );
 }
 
