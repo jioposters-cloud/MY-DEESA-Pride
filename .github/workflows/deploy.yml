@@ -21,11 +21,11 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Clean up node_modules
-        run: rm -rf node_modules package-lock.json
-
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Rebuild native modules
+        run: npm rebuild
 
       - name: Build with Vite
         run: npm run build
