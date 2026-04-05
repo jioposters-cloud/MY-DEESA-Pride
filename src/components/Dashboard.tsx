@@ -7,22 +7,31 @@ import {
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
+import { cn } from '../lib/utils';
+import AIChat from './AIChat';
 
 interface DashboardProps {
-  onNavigate: (screen: Screen) => void;
+  onNavigate: (screen: Screen, category?: string) => void;
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
   const [featuredItems, setFeaturedItems] = useState<DirectoryItem[]>([]);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isFabOpen, setIsFabOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
   useEffect(() => {
-    async function loadFeatured() {
+    async function loadData() {
       const data = await fetchDirectoryData();
       const featured = data.filter(item => item.category === 'Featured Spotlights');
       setFeaturedItems(featured);
+      
+      const cats = Array.from(new Set(data.map(item => item.category))).sort();
+      setAllCategories(cats);
     }
-    loadFeatured();
+    loadData();
   }, []);
 
   const categories = [
@@ -48,6 +57,64 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] pb-28">
+      <AIChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      
+      {/* Category Modal */}
+      <AnimatePresence>
+        {isCategoryModalOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsCategoryModalOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+            >
+              <div className="p-8 border-b border-gray-100 flex justify-between items-center bg-[#b71700] text-white">
+                <div>
+                  <h3 className="text-2xl font-black tracking-tighter uppercase">Explore Categories</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Browse by business type</p>
+                </div>
+                <button 
+                  onClick={() => setIsCategoryModalOpen(false)}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-8">
+                <div className="grid grid-cols-3 gap-6">
+                  {allCategories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        onNavigate('phonebook', cat);
+                        setIsCategoryModalOpen(false);
+                        setIsSidebarOpen(false);
+                      }}
+                      className="flex flex-col items-center gap-3 group"
+                    >
+                      <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl font-black text-[#b71700] group-hover:bg-[#fedf36] group-hover:text-[#211b00] transition-all shadow-sm group-active:scale-95">
+                        {cat.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-[10px] font-bold text-center text-gray-600 uppercase tracking-tighter leading-tight group-hover:text-gray-900">
+                        {cat}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Sidebar Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -85,6 +152,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 />
                 <SidebarItem 
                   icon={LayoutGrid} 
+                  label="Explore Categories" 
+                  onClick={() => { setIsCategoryModalOpen(true); }}
+                />
+                <SidebarItem 
+                  icon={LayoutGrid} 
                   label="All Services" 
                   onClick={() => { onNavigate('dashboard'); setIsSidebarOpen(false); }}
                 />
@@ -111,6 +183,61 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 </p>
               </div>
             </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* FAB Menu Overlay */}
+      <AnimatePresence>
+        {isFabOpen && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsFabOpen(false)}
+              className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[45]"
+            />
+            <div className="fixed bottom-40 right-6 z-50 flex flex-col items-end gap-4">
+              <motion.button
+                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                onClick={() => {
+                  window.open('https://forms.gle/qq23MUr12Gn3kqPAA', '_blank');
+                  setIsFabOpen(false);
+                }}
+                className="bg-white text-[#b71700] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100 group"
+              >
+                <div className="flex flex-col items-end">
+                  <span className="text-xs font-black uppercase tracking-tight">Add Business Details</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">તમારો ધંધો,સેવાઓ ઉમેરો</span>
+                </div>
+                <div className="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Building2 className="w-5 h-5" />
+                </div>
+              </motion.button>
+
+              <motion.button
+                initial={{ opacity: 0, y: 20, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.8 }}
+                transition={{ delay: 0.05 }}
+                onClick={() => {
+                  setIsChatOpen(true);
+                  setIsFabOpen(false);
+                }}
+                className="bg-white text-[#b71700] px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-gray-100 group"
+              >
+                <div className="flex flex-col items-end">
+                  <span className="text-xs font-black uppercase tracking-tight">AI Help Assistant</span>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Find related information</span>
+                </div>
+                <div className="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <User className="w-5 h-5" />
+                </div>
+              </motion.button>
+            </div>
           </>
         )}
       </AnimatePresence>
@@ -166,20 +293,31 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         </section>
 
         {/* Service Grid */}
-        <section className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-6 gap-x-4">
-          {categories.map((cat) => (
-            <motion.button
-              key={cat.id}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleCategoryClick(cat)}
-              className="flex flex-col items-center gap-3 group"
+        <section className="space-y-4">
+          <div className="flex justify-between items-center">
+            <h2 className="text-sm font-black text-[#b71700] tracking-widest uppercase">Quick Services</h2>
+            <button 
+              onClick={() => setIsCategoryModalOpen(true)}
+              className="text-[10px] font-bold text-red-500 uppercase tracking-widest hover:underline"
             >
-              <div className={`w-20 h-20 ${cat.color} rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm`}>
-                <cat.icon className="w-12 h-12" />
-              </div>
-              <span className="text-[11px] font-bold text-center text-gray-600 uppercase tracking-tight leading-tight">{cat.name}</span>
-            </motion.button>
-          ))}
+              View All &gt;
+            </button>
+          </div>
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-6 gap-x-4">
+            {categories.map((cat) => (
+              <motion.button
+                key={cat.id}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleCategoryClick(cat)}
+                className="flex flex-col items-center gap-3 group"
+              >
+                <div className={`w-20 h-20 ${cat.color} rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm`}>
+                  <cat.icon className="w-12 h-12" />
+                </div>
+                <span className="text-[11px] font-bold text-center text-gray-600 uppercase tracking-tight leading-tight">{cat.name}</span>
+              </motion.button>
+            ))}
+          </div>
         </section>
 
         {/* Featured Spotlights */}
@@ -233,7 +371,13 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       </nav>
 
       {/* FAB */}
-      <button className="fixed bottom-24 right-6 w-14 h-14 bg-[#fedf36] text-[#211b00] rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40">
+      <button 
+        onClick={() => setIsFabOpen(!isFabOpen)}
+        className={cn(
+          "fixed bottom-24 right-6 w-14 h-14 bg-[#fedf36] text-[#211b00] rounded-full shadow-2xl flex items-center justify-center transition-all z-[55]",
+          isFabOpen ? "rotate-45 scale-90 bg-gray-100" : "active:scale-90"
+        )}
+      >
         <Plus className="w-8 h-8" />
       </button>
     </div>

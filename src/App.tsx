@@ -8,6 +8,7 @@ import ExternalView from './components/ExternalView';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
+  const [initialCategory, setInitialCategory] = useState<string | null>(null);
 
   useEffect(() => {
     OneSignal.init({
@@ -21,8 +22,10 @@ export default function App() {
     const handlePopState = (event: PopStateEvent) => {
       if (event.state && event.state.screen) {
         setCurrentScreen(event.state.screen);
+        setInitialCategory(event.state.category || null);
       } else {
         setCurrentScreen('welcome');
+        setInitialCategory(null);
       }
     };
 
@@ -30,10 +33,11 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const navigateTo = (screen: Screen) => {
-    if (screen === currentScreen) return;
+  const navigateTo = (screen: Screen, category?: string) => {
+    if (screen === currentScreen && category === initialCategory) return;
     setCurrentScreen(screen);
-    window.history.pushState({ screen }, '');
+    setInitialCategory(category || null);
+    window.history.pushState({ screen, category }, '');
   };
 
   const goBack = () => {
@@ -52,7 +56,7 @@ export default function App() {
       case 'jobs':
       case 'food':
       case 'realestate':
-        return <DirectoryList screen={currentScreen} onBack={goBack} />;
+        return <DirectoryList screen={currentScreen} onBack={goBack} initialCategory={initialCategory} />;
       case 'weather':
         return (
           <ExternalView 

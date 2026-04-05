@@ -11,9 +11,10 @@ import { cn } from '../lib/utils';
 interface DirectoryListProps {
   screen: Screen;
   onBack: () => void;
+  initialCategory?: string | null;
 }
 
-export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
+export default function DirectoryList({ screen, onBack, initialCategory }: DirectoryListProps) {
   const [items, setItems] = useState<DirectoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,12 +51,17 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
 
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [activeSubCategory, setActiveSubCategory] = useState<string>('All');
+  const [showCategoriesModal, setShowCategoriesModal] = useState(false);
 
   useEffect(() => {
-    if (categories.length > 0 && !activeCategory) {
-      setActiveCategory(categories[0]);
+    if (categories.length > 0) {
+      if (initialCategory && categories.includes(initialCategory)) {
+        setActiveCategory(initialCategory);
+      } else if (!activeCategory) {
+        setActiveCategory(categories[0]);
+      }
     }
-  }, [categories, activeCategory]);
+  }, [categories, activeCategory, initialCategory]);
 
   const subCategories = useMemo(() => {
     if (!activeCategory) return ['All'];
@@ -112,7 +118,12 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
           <section className="space-y-4">
             <div className="flex justify-between items-center">
               <h2 className="text-sm font-black text-[#b71700] tracking-widest uppercase">Explore Categories</h2>
-              <button className="text-[10px] font-bold text-red-500 uppercase tracking-widest">View All &gt;</button>
+              <button 
+                onClick={() => setShowCategoriesModal(true)}
+                className="text-[10px] font-bold text-red-500 uppercase tracking-widest hover:underline"
+              >
+                View All &gt;
+              </button>
             </div>
             <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
               {categories.map((cat) => (
@@ -186,6 +197,73 @@ export default function DirectoryList({ screen, onBack }: DirectoryListProps) {
           </div>
         )}
       </main>
+
+      {/* Categories Modal */}
+      <AnimatePresence>
+        {showCategoriesModal && (
+          <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCategoriesModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-2xl bg-white rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col max-h-[80vh]"
+            >
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#b71700] text-white">
+                <div>
+                  <h3 className="text-xl font-black tracking-tighter uppercase">Explore Categories</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Find exactly what you need</p>
+                </div>
+                <button 
+                  onClick={() => setShowCategoriesModal(false)}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+              
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-6">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setActiveCategory(cat);
+                        setActiveSubCategory('All');
+                        setShowCategoriesModal(false);
+                      }}
+                      className="flex flex-col items-center gap-3 group"
+                    >
+                      <div className={cn(
+                        "w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black transition-all shadow-sm ring-2 ring-transparent group-hover:scale-110",
+                        activeCategory === cat ? "bg-[#fedf36] text-[#211b00] ring-[#fedf36]" : "bg-[#2d5a44] text-white"
+                      )}>
+                        {cat.charAt(0).toUpperCase()}
+                      </div>
+                      <span className={cn(
+                        "text-[10px] font-bold text-center leading-tight uppercase tracking-tighter",
+                        activeCategory === cat ? "text-gray-900" : "text-gray-500"
+                      )}>{cat}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="p-6 bg-gray-50 border-t border-gray-100 text-center">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                  {categories.length} Categories available in {screen}
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Info Modal */}
       <AnimatePresence>
