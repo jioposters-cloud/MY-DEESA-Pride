@@ -9,6 +9,7 @@ import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
 import { cn } from '../lib/utils';
 import AIChat from './AIChat';
+import CategoryIcon from './CategoryIcon';
 
 interface DashboardProps {
   onNavigate: (screen: Screen, category?: string) => void;
@@ -100,9 +101,10 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                       }}
                       className="flex flex-col items-center gap-3 group"
                     >
-                      <div className="w-16 h-16 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl font-black text-[#b71700] group-hover:bg-[#fedf36] group-hover:text-[#211b00] transition-all shadow-sm group-active:scale-95">
-                        {cat.charAt(0).toUpperCase()}
-                      </div>
+                      <CategoryIcon 
+                        category={cat} 
+                        className="group-hover:scale-110 group-active:scale-95"
+                      />
                       <span className="text-[10px] font-bold text-center text-gray-600 uppercase tracking-tighter leading-tight group-hover:text-gray-900">
                         {cat}
                       </span>

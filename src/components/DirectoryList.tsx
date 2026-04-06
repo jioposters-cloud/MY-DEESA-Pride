@@ -7,6 +7,7 @@ import {
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
 import { cn } from '../lib/utils';
+import CategoryIcon from './CategoryIcon';
 
 interface DirectoryListProps {
   screen: Screen;
@@ -135,12 +136,14 @@ export default function DirectoryList({ screen, onBack, initialCategory }: Direc
                   }}
                   className="flex flex-col items-center gap-2 flex-shrink-0 group"
                 >
-                  <div className={cn(
-                    "w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black transition-all shadow-sm ring-2 ring-transparent",
-                    activeCategory === cat ? "bg-[#fedf36] text-[#211b00] ring-[#fedf36]" : "bg-[#2d5a44] text-white"
-                  )}>
-                    {cat.charAt(0).toUpperCase()}
-                  </div>
+                  <CategoryIcon 
+                    category={cat} 
+                    active={activeCategory === cat}
+                    className={cn(
+                      "transition-all shadow-sm ring-2 ring-transparent",
+                      activeCategory === cat ? "ring-[#fedf36]" : ""
+                    )}
+                  />
                   <span className={cn(
                     "text-[10px] font-bold text-center max-w-[80px] leading-tight uppercase tracking-tighter",
                     activeCategory === cat ? "text-gray-900" : "text-gray-500"
@@ -240,12 +243,14 @@ export default function DirectoryList({ screen, onBack, initialCategory }: Direc
                       }}
                       className="flex flex-col items-center gap-3 group"
                     >
-                      <div className={cn(
-                        "w-16 h-16 rounded-full flex items-center justify-center text-2xl font-black transition-all shadow-sm ring-2 ring-transparent group-hover:scale-110",
-                        activeCategory === cat ? "bg-[#fedf36] text-[#211b00] ring-[#fedf36]" : "bg-[#2d5a44] text-white"
-                      )}>
-                        {cat.charAt(0).toUpperCase()}
-                      </div>
+                      <CategoryIcon 
+                        category={cat} 
+                        active={activeCategory === cat}
+                        className={cn(
+                          "transition-all shadow-sm ring-2 ring-transparent group-hover:scale-110",
+                          activeCategory === cat ? "ring-[#fedf36]" : ""
+                        )}
+                      />
                       <span className={cn(
                         "text-[10px] font-bold text-center leading-tight uppercase tracking-tighter",
                         activeCategory === cat ? "text-gray-900" : "text-gray-500"

@@ -122,7 +122,7 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
                   <h3 className="font-black uppercase tracking-tight">MyDeesa AI</h3>
                   <div className="flex items-center gap-1.5">
                     <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-70 text-green-400">Free Forever</span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest opacity-70 text-green-400">Online</span>
                   </div>
                 </div>
               </div>
