@@ -3,7 +3,7 @@ import {
   Calculator, Scale, Tractor, Car, Landmark, Stethoscope, 
   HardHat, Key, Snowflake, Monitor, Utensils, Briefcase, 
   Home, Cloud, ShoppingBag, Contact, Compass, GraduationCap, 
-  Scissors, Zap, Plane, HelpCircle, Camera, 
+  Scissors, Zap, Plane, Camera, 
   Music, Film, Coffee, Truck, Wrench, Heart, ShoppingCart
 } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -58,7 +58,7 @@ export const getCategoryIcon = (category: string) => {
   if (cat.includes('heart') || cat.includes('charity') || cat.includes('ngo')) return Heart;
   if (cat.includes('cart') || cat.includes('grocery')) return ShoppingCart;
   
-  return HelpCircle;
+  return null;
 };
 
 export const getCategoryColor = (category: string) => {
@@ -81,10 +81,19 @@ export default function CategoryIcon({ category, className, active = false }: Ca
       active ? colors.activeBg : colors.bg,
       className
     )}>
-      <Icon className={cn(
-        "w-8 h-8",
-        active ? colors.activeIcon : colors.icon
-      )} />
+      {Icon ? (
+        <Icon className={cn(
+          "w-8 h-8",
+          active ? colors.activeIcon : colors.icon
+        )} />
+      ) : (
+        <span className={cn(
+          "text-2xl font-black uppercase",
+          active ? colors.activeIcon : colors.icon
+        )}>
+          {category.charAt(0)}
+        </span>
+      )}
     </div>
   );
 }
