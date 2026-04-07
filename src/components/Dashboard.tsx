@@ -311,10 +311,21 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 key={cat.id}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCategoryClick(cat)}
-                className="flex flex-col items-center gap-3 group"
+                className="flex flex-col items-center gap-3 group relative"
               >
-                <div className={`w-20 h-20 ${cat.color} rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm`}>
-                  <cat.icon className="w-12 h-12" />
+                <div className="relative">
+                  {cat.id === 'phonebook' && (
+                    <>
+                      <div className="absolute inset-0 bg-[#b71700]/20 rounded-full animate-pulse-wave" />
+                      <div className="absolute inset-0 bg-[#b71700]/10 rounded-full animate-pulse-wave [animation-delay:0.5s]" />
+                    </>
+                  )}
+                  <div className={cn(
+                    "w-20 h-20 rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm relative z-10",
+                    cat.color
+                  )}>
+                    <cat.icon className="w-12 h-12" />
+                  </div>
                 </div>
                 <span className="text-[11px] font-bold text-center text-gray-600 uppercase tracking-tight leading-tight">{cat.name}</span>
               </motion.button>
@@ -367,7 +378,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       <nav className="fixed bottom-0 w-full rounded-t-2xl z-50 bg-white/90 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.05)] h-20 px-4 flex justify-around items-center">
         <NavItem icon={Home} label="Home" active onClick={() => onNavigate('dashboard')} />
         <NavItem icon={LayoutGrid} label="Services" onClick={() => setIsCategoryModalOpen(true)} />
-        <NavItem icon={Compass} label="Explore" onClick={() => onNavigate('explore')} />
+        <NavItem icon={Compass} label="Explore" showWave onClick={() => onNavigate('explore')} />
         <NavItem icon={Briefcase} label="Jobs" onClick={() => onNavigate('jobs')} />
         <NavItem icon={ShoppingBag} label="Shopping" onClick={() => onNavigate('shopping')} />
       </nav>
@@ -430,14 +441,25 @@ function FeaturedCard({ title, subtitle, tag, image, tagColor, url }: any) {
   return content;
 }
 
-function NavItem({ icon: Icon, label, active = false, onClick }: any) {
+function NavItem({ icon: Icon, label, active = false, onClick, showWave = false }: any) {
   return (
     <button 
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-1 px-3 py-1 rounded-full transition-all ${active ? 'bg-red-50 text-[#b71700]' : 'text-gray-400 hover:text-[#b71700]'}`}
+      className={cn(
+        "flex flex-col items-center justify-center gap-1 px-3 py-1 rounded-full transition-all relative",
+        active ? 'bg-red-50 text-[#b71700]' : 'text-gray-400 hover:text-[#b71700]'
+      )}
     >
-      <Icon className="w-6 h-6" />
-      <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
+      <div className="relative">
+        {showWave && (
+          <>
+            <div className="absolute inset-0 bg-[#b71700]/20 rounded-full animate-glow-wave" />
+            <div className="absolute inset-0 bg-[#b71700]/10 rounded-full animate-glow-wave [animation-delay:1s]" />
+          </>
+        )}
+        <Icon className="w-6 h-6 relative z-10" />
+      </div>
+      <span className="text-[10px] font-bold uppercase tracking-widest relative z-10">{label}</span>
     </button>
   );
 }
