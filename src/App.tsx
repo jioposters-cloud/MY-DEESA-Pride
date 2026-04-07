@@ -5,6 +5,7 @@ import Welcome from './components/Welcome';
 import Dashboard from './components/Dashboard';
 import DirectoryList from './components/DirectoryList';
 import ExternalView from './components/ExternalView';
+import ExploreGallery from './components/ExploreGallery';
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('welcome');
@@ -57,6 +58,8 @@ export default function App() {
       case 'food':
       case 'realestate':
         return <DirectoryList screen={currentScreen} onBack={goBack} initialCategory={initialCategory} />;
+      case 'explore':
+        return <ExploreGallery onBack={goBack} />;
       case 'weather':
         return (
           <ExternalView 

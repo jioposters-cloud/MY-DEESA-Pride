@@ -42,7 +42,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'realestate', name: 'Real Estate Schemes', icon: Home, color: 'bg-indigo-50 text-indigo-700', screen: 'realestate' },
     { id: 'jobs', name: 'Job Vacancies', icon: Briefcase, color: 'bg-green-50 text-emerald-700', screen: 'jobs' },
     { id: 'food', name: 'Food', icon: Utensils, color: 'bg-orange-50 text-orange-700', screen: 'food' },
-    { id: 'explore', name: 'Explore City', icon: Compass, color: 'bg-purple-50 text-purple-700', screen: 'dashboard' },
+    { id: 'explore', name: 'Explore City', icon: Compass, color: 'bg-purple-50 text-purple-700', screen: 'explore' },
     { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
     { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
@@ -366,8 +366,8 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       {/* Bottom Nav */}
       <nav className="fixed bottom-0 w-full rounded-t-2xl z-50 bg-white/90 backdrop-blur-md shadow-[0_-4px_20px_rgba(0,0,0,0.05)] h-20 px-4 flex justify-around items-center">
         <NavItem icon={Home} label="Home" active onClick={() => onNavigate('dashboard')} />
-        <NavItem icon={LayoutGrid} label="Services" onClick={() => onNavigate('dashboard')} />
-        <NavItem icon={Compass} label="Explore" onClick={() => onNavigate('dashboard')} />
+        <NavItem icon={LayoutGrid} label="Services" onClick={() => setIsCategoryModalOpen(true)} />
+        <NavItem icon={Compass} label="Explore" onClick={() => onNavigate('explore')} />
         <NavItem icon={Briefcase} label="Jobs" onClick={() => onNavigate('jobs')} />
         <NavItem icon={ShoppingBag} label="Shopping" onClick={() => onNavigate('shopping')} />
       </nav>

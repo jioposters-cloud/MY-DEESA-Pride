@@ -377,8 +377,8 @@ const ImageGallery: React.FC<{ images: string[], onClose: () => void, title: str
                 onClick={(e) => { e.stopPropagation(); next(); }}
                 className="absolute right-4 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-sm"
               >
-                <motion.div rotate={180}>
-                  <ArrowLeft className="w-6 h-6 rotate-180" />
+                <motion.div style={{ rotate: 180 }}>
+                  <ArrowLeft className="w-6 h-6" />
                 </motion.div>
               </button>
             </>
