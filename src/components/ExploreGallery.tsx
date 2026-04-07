@@ -36,7 +36,7 @@ export default function ExploreGallery({ onBack }: ExploreGalleryProps) {
     const container = containerRef.current;
     let animationFrameId: number;
     let lastTime = 0;
-    const scrollSpeed = 0.5; // Pixels per frame approx
+    const scrollSpeed = 0.8; // Slightly faster for better visibility
 
     const scroll = (time: number) => {
       if (lastTime !== 0) {
@@ -44,8 +44,6 @@ export default function ExploreGallery({ onBack }: ExploreGalleryProps) {
         container.scrollLeft += scrollSpeed * (delta / 16);
 
         // Infinite loop reset logic
-        // We use 3 sets of items. When we reach the end of the 3rd set or start of 1st, 
-        // we jump to the corresponding position in the 2nd set.
         const setWidth = container.scrollWidth / 3;
         if (container.scrollLeft >= setWidth * 2) {
           container.scrollLeft -= setWidth;
@@ -65,23 +63,19 @@ export default function ExploreGallery({ onBack }: ExploreGalleryProps) {
 
     animationFrameId = requestAnimationFrame(scroll);
 
-    // Pause on interaction
+    // Pause on interaction (only touch for now to let PC users see it scroll)
     const pauseScroll = () => cancelAnimationFrame(animationFrameId);
     const resumeScroll = () => {
       lastTime = 0;
       animationFrameId = requestAnimationFrame(scroll);
     };
 
-    container.addEventListener('mouseenter', pauseScroll);
-    container.addEventListener('mouseleave', resumeScroll);
     container.addEventListener('touchstart', pauseScroll);
     container.addEventListener('touchend', resumeScroll);
 
     return () => {
       clearTimeout(timeoutId);
       cancelAnimationFrame(animationFrameId);
-      container.removeEventListener('mouseenter', pauseScroll);
-      container.removeEventListener('mouseleave', resumeScroll);
       container.removeEventListener('touchstart', pauseScroll);
       container.removeEventListener('touchend', resumeScroll);
     };
@@ -258,48 +252,37 @@ interface ExploreCardProps {
   onShowGallery: (item: DirectoryItem) => void;
 }
 
-const ExploreCard: React.FC<ExploreCardProps> = ({ item, containerRef, index, onShowGallery }) => {
+const ExploreCard: React.FC<ExploreCardProps> = ({ item, containerRef, onShowGallery }) => {
   const cardRef = useRef<HTMLDivElement>(null);
-  const [x, setX] = useState(0);
   const [showActions, setShowActions] = useState(false);
 
-  useEffect(() => {
-    const updateX = () => {
-      if (cardRef.current && containerRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect();
-        const cardRect = cardRef.current.getBoundingClientRect();
-        const center = containerRect.left + containerRect.width / 2;
-        const cardCenter = cardRect.left + cardRect.width / 2;
-        const distanceFromCenter = cardCenter - center;
-        setX(distanceFromCenter / (containerRect.width / 2));
-      }
-    };
+  const { scrollXProgress } = useScroll({
+    container: containerRef,
+    target: cardRef,
+    axis: "x",
+    offset: ["start end", "end start"]
+  });
 
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', updateX);
-      updateX();
-    }
-    return () => container?.removeEventListener('scroll', updateX);
-  }, [containerRef]);
-
+  // Map scroll progress (0 to 1) to a -1 to 1 range where 0 is center
+  const x = useTransform(scrollXProgress, [0, 0.5, 1], [-1, 0, 1]);
+  
   // Curved path logic
-  // y = a * x^2 (parabola)
-  const y = x * x * 100;
-  const rotate = x * 15;
-  const scale = 1 - Math.abs(x) * 0.15;
-  const opacity = 1 - Math.abs(x) * 0.5;
+  const y = useTransform(x, (val) => val * val * 150); // Deeper curve
+  const rotate = useTransform(x, [-1, 1], [-25, 25]); // More rotation
+  const scale = useTransform(x, [-1, 0, 1], [0.75, 1, 0.75]);
+  const opacity = useTransform(x, [-1, -0.5, 0, 0.5, 1], [0.3, 0.7, 1, 0.7, 0.3]);
 
   return (
     <motion.div
       ref={cardRef}
+      whileHover={{ scale: 1.05, zIndex: 50 }}
       style={{
         y,
         rotate,
         scale,
-        opacity: Math.max(0.3, opacity)
+        opacity
       }}
-      className="w-[280px] md:w-[320px] aspect-[3/4] bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col snap-center group relative border border-gray-100"
+      className="w-[280px] md:w-[320px] aspect-[3/4] bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col group relative border border-gray-100"
     >
       <div 
         className="relative h-2/3 overflow-hidden cursor-pointer"
@@ -315,8 +298,9 @@ const ExploreCard: React.FC<ExploreCardProps> = ({ item, containerRef, index, on
         
         {/* Verified Badge */}
         {item.verified && (
-          <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg">
-            <CheckCircle2 className="w-5 h-5 text-[#00a3ff] fill-[#00a3ff] text-white" />
+          <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md px-2 py-1 rounded-full shadow-lg flex items-center gap-1">
+            <CheckCircle2 className="w-4 h-4 text-[#00a3ff] fill-[#00a3ff] text-white" />
+            <span className="text-[8px] font-black text-[#00a3ff] uppercase tracking-tighter">Verified</span>
           </div>
         )}
 
