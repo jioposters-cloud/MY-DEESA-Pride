@@ -14,9 +14,3 @@ export interface DirectoryItem {
 }
 
 export type Screen = 'welcome' | 'dashboard' | 'phonebook' | 'rental' | 'property' | 'jobs' | 'food' | 'weather' | 'apmc' | 'shopping' | 'realestate' | 'explore';
-
-declare global {
-  interface Window {
-    google: any;
-  }
-}
