@@ -10,6 +10,7 @@ import { fetchDirectoryData } from '../services/sheetService';
 import { cn } from '../lib/utils';
 import AIChat from './AIChat';
 import CategoryIcon from './CategoryIcon';
+import GoogleAuth from './GoogleAuth';
 
 interface DashboardProps {
   onNavigate: (screen: Screen, category?: string) => void;
@@ -58,6 +59,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   return (
     <div className="min-h-screen bg-[#f8f9ff] pb-28">
+      <GoogleAuth onAuthSuccess={(email) => console.log('User authenticated:', email)} />
       <AIChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       
       {/* Category Modal */}
