@@ -181,7 +181,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
               <div className="p-6 border-t border-gray-100 bg-gray-50">
                 <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-relaxed">
-                  Brought to you by Dr,Ankit M.Patel | Imax Dental , Deesa
+                  Brought to you by Dr.Ankit M.Patel | Imax Dental , Deesa
                 </p>
               </div>
             </motion.div>

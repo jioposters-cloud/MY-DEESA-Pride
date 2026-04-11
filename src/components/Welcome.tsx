@@ -65,7 +65,7 @@ export default function Welcome({ onExplore }: WelcomeProps) {
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-[#fedf36] animate-pulse"></span>
             <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest text-center max-w-[300px] leading-relaxed">
-              Brought to you by Dr,Ankit M.Patel | Imax Dental , Deesa
+              Brought to you by Dr.Ankit M.Patel | Imax Dental , Deesa
             </span>
           </div>
         </div>

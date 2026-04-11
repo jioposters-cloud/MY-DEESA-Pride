@@ -59,7 +59,8 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     try {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        throw new Error('GEMINI_API_KEY is not configured');
+        console.error('GEMINI_API_KEY is missing from environment variables');
+        throw new Error('API Key missing');
       }
 
       const ai = new GoogleGenAI({ apiKey });
@@ -67,29 +68,27 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
       // Prepare context from directory data
       const context = directoryData.map(item => 
         `Name: ${item.name}, Category: ${item.category}, SubCategory: ${item.subCategory}, Info: ${item.info}, Location: ${item.location}, Mobile: ${item.mobile}`
-      ).join('\n').slice(0, 30000); // Increased limit slightly
+      ).join('\n').slice(0, 30000);
+
+      const prompt = `You are the MyDeesa AI Assistant, a helpful guide for the city of Deesa, Gujarat. 
+Your goal is to help users find information about local services, shops, jobs, and rentals in Deesa.
+
+Here is the current directory data for Deesa:
+${context}
+
+User Question: ${userMessage}
+
+Instructions:
+1. Use the provided directory data to answer questions.
+2. If you find matching items, provide their names and relevant details (like mobile or location).
+3. If you don't find a specific match, suggest related categories or general advice about Deesa.
+4. Keep your tone helpful, professional, and local.
+5. Answer in English, but you can use common Gujarati/Hindi terms if appropriate.
+6. Be concise.`;
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: [{
-          parts: [{
-            text: `You are the MyDeesa AI Assistant, a helpful guide for the city of Deesa, Gujarat. 
-            Your goal is to help users find information about local services, shops, jobs, and rentals in Deesa.
-            
-            Here is the current directory data for Deesa:
-            ${context}
-            
-            User Question: ${userMessage}
-            
-            Instructions:
-            1. Use the provided directory data to answer questions.
-            2. If you find matching items, provide their names and relevant details (like mobile or location).
-            3. If you don't find a specific match, suggest related categories or general advice about Deesa.
-            4. Keep your tone helpful, professional, and local.
-            5. Answer in English, but you can use common Gujarati/Hindi terms if appropriate.
-            6. Be concise.`
-          }]
-        }],
+        contents: prompt,
         config: {
           systemInstruction: "You are a helpful local assistant for Deesa city. You help users find shops, services, and info from the MyDeesa directory.",
         }
@@ -97,9 +96,12 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
 
       const aiResponse = response.text || "I'm sorry, I couldn't process that. Please try again.";
       setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
-    } catch (error) {
-      console.error('AI Chat Error:', error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
+    } catch (error: any) {
+      console.error('AI Chat Error Details:', error);
+      const errorMessage = error.message?.includes('API Key') 
+        ? "The AI Assistant is not configured yet. Please check the API key settings."
+        : "Sorry, I'm having trouble connecting to the AI service. Please try again in a moment.";
+      setMessages(prev => [...prev, { role: 'assistant', content: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
