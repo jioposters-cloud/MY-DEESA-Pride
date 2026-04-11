@@ -43,42 +43,53 @@ export default function AIChat({ isOpen, onClose }: AIChatProps) {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
+    if (directoryData.length === 0) {
+      setMessages(prev => [...prev, 
+        { role: 'user', content: userMessage },
+        { role: 'assistant', content: "I'm still loading the directory data. Please wait a moment and try again." }
+      ]);
+      setInput('');
+      return;
+    }
+
     setInput('');
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error('GEMINI_API_KEY is not configured');
+      }
+
+      const ai = new GoogleGenAI({ apiKey });
       
       // Prepare context from directory data
       const context = directoryData.map(item => 
         `Name: ${item.name}, Category: ${item.category}, SubCategory: ${item.subCategory}, Info: ${item.info}, Location: ${item.location}, Mobile: ${item.mobile}`
-      ).join('\n').slice(0, 20000); // Limit context size
+      ).join('\n').slice(0, 30000); // Increased limit slightly
 
       const response = await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: [
-          {
-            role: "user",
-            parts: [{
-              text: `You are the MyDeesa AI Assistant, a helpful guide for the city of Deesa, Gujarat. 
-              Your goal is to help users find information about local services, shops, jobs, and rentals in Deesa.
-              
-              Here is the current directory data for Deesa:
-              ${context}
-              
-              User Question: ${userMessage}
-              
-              Instructions:
-              1. Use the provided directory data to answer questions.
-              2. If you find matching items, provide their names and relevant details (like mobile or location).
-              3. If you don't find a specific match, suggest related categories or general advice about Deesa.
-              4. Keep your tone helpful, professional, and local.
-              5. Answer in English, but you can use common Gujarati/Hindi terms if appropriate.
-              6. Be concise.`
-            }]
-          }
-        ],
+        contents: [{
+          parts: [{
+            text: `You are the MyDeesa AI Assistant, a helpful guide for the city of Deesa, Gujarat. 
+            Your goal is to help users find information about local services, shops, jobs, and rentals in Deesa.
+            
+            Here is the current directory data for Deesa:
+            ${context}
+            
+            User Question: ${userMessage}
+            
+            Instructions:
+            1. Use the provided directory data to answer questions.
+            2. If you find matching items, provide their names and relevant details (like mobile or location).
+            3. If you don't find a specific match, suggest related categories or general advice about Deesa.
+            4. Keep your tone helpful, professional, and local.
+            5. Answer in English, but you can use common Gujarati/Hindi terms if appropriate.
+            6. Be concise.`
+          }]
+        }],
         config: {
           systemInstruction: "You are a helpful local assistant for Deesa city. You help users find shops, services, and info from the MyDeesa directory.",
         }
