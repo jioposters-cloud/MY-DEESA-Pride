@@ -57,7 +57,14 @@ export default function App() {
       case 'jobs':
       case 'food':
       case 'realestate':
-        return <DirectoryList screen={currentScreen} onBack={goBack} initialCategory={initialCategory} />;
+        return (
+          <DirectoryList 
+            screen={currentScreen} 
+            onBack={goBack} 
+            initialCategory={initialCategory} 
+            onCategoryChange={(cat) => setInitialCategory(cat)}
+          />
+        );
       case 'explore':
         return <ExploreGallery onBack={goBack} />;
       case 'weather':

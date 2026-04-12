@@ -13,9 +13,10 @@ interface DirectoryListProps {
   screen: Screen;
   onBack: () => void;
   initialCategory?: string | null;
+  onCategoryChange?: (category: string | null) => void;
 }
 
-export default function DirectoryList({ screen, onBack, initialCategory }: DirectoryListProps) {
+export default function DirectoryList({ screen, onBack, initialCategory, onCategoryChange }: DirectoryListProps) {
   const [items, setItems] = useState<DirectoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,6 +42,10 @@ export default function DirectoryList({ screen, onBack, initialCategory }: Direc
       
       setItems(filtered);
       setLoading(false);
+      
+      // Reset category selection when screen changes
+      setActiveCategory(null);
+      setActiveSubCategory('All');
     }
     loadData();
   }, [screen]);
@@ -50,19 +55,31 @@ export default function DirectoryList({ screen, onBack, initialCategory }: Direc
     return cats.sort();
   }, [items]);
 
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string | null>(initialCategory || null);
   const [activeSubCategory, setActiveSubCategory] = useState<string>('All');
   const [showCategoriesModal, setShowCategoriesModal] = useState(false);
+
+  // Sync with initialCategory prop
+  useEffect(() => {
+    if (initialCategory && initialCategory !== activeCategory) {
+      setActiveCategory(initialCategory);
+      setActiveSubCategory('All');
+    }
+  }, [initialCategory]);
 
   useEffect(() => {
     if (categories.length > 0) {
       if (initialCategory && categories.includes(initialCategory)) {
-        setActiveCategory(initialCategory);
+        if (activeCategory !== initialCategory) {
+          setActiveCategory(initialCategory);
+        }
       } else if (!activeCategory) {
-        setActiveCategory(categories[0]);
+        const firstCat = categories[0];
+        setActiveCategory(firstCat);
+        if (onCategoryChange) onCategoryChange(firstCat);
       }
     }
-  }, [categories, activeCategory, initialCategory]);
+  }, [categories, activeCategory, initialCategory, onCategoryChange]);
 
   const subCategories = useMemo(() => {
     if (!activeCategory) return ['All'];
@@ -133,6 +150,7 @@ export default function DirectoryList({ screen, onBack, initialCategory }: Direc
                   onClick={() => {
                     setActiveCategory(cat);
                     setActiveSubCategory('All');
+                    if (onCategoryChange) onCategoryChange(cat);
                   }}
                   className="flex flex-col items-center gap-2 flex-shrink-0 group"
                 >
@@ -239,6 +257,7 @@ export default function DirectoryList({ screen, onBack, initialCategory }: Direc
                       onClick={() => {
                         setActiveCategory(cat);
                         setActiveSubCategory('All');
+                        if (onCategoryChange) onCategoryChange(cat);
                         setShowCategoriesModal(false);
                       }}
                       className="flex flex-col items-center gap-3 group"
