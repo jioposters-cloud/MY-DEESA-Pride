@@ -174,8 +174,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 />
                 <div className="pt-6 mt-6 border-t border-gray-100">
                   <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Support & Info</p>
-                  <SidebarItem icon={Phone} label="Contact Us" onClick={() => {}} />
-                  <SidebarItem icon={Mail} label="Email Support" onClick={() => {}} />
+                  <SidebarItem icon={Phone} label="Contact Us" onClick={() => window.open('tel:+919924510101', '_self')} />
+                  <SidebarItem icon={Mail} label="Email Support" onClick={() => window.open('mailto:deesanew@gmail.com', '_self')} />
+                  <p className="px-4 mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-tight">
+                    Data is managed by Team MY DEESA
+                  </p>
                 </div>
               </div>
 
