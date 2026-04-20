@@ -149,7 +149,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 <SidebarItem 
                   icon={Globe} 
                   label="Explore MyDeesa" 
-                  onClick={() => window.open('https://www.mydeesa.in/', '_blank')}
+                  onClick={() => { onNavigate('explore'); setIsSidebarOpen(false); }}
                   active
                 />
                 <SidebarItem 
@@ -277,7 +277,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
               className="text-sm font-medium"
             >
-              APMC Rates (21/03/2026): Castor 1295-1308 • Mustard 1175-1371 • Bajri 400-514 • Wheat 421-585 • Rajgaro 1600-1930 • Cumin 3600-4301 • Chana 1000-1016 • V.J. Patel Market: Potato 50-135 • Onion 200-330 • Apple 1800-2440 • Weather: Clear Sky 28°C, Humidity 45%, Wind 10 km/h NW • No significant weather warnings.
+              APMC Deesa (17/04/2026): Castor 1240-1271 • Mustard 1200-1330 • Bajri 411-477 • Wheat 435-625 • Rajgaro 1600-1871 • Cumin 3300-3591 • Chana 1022-1039 • V.J. Patel (15/04/2026): Potato 100-270 • Onion 200-370 • Apple 2500-3050 • Tomato 100-180 • Bhildi (15/04/2026): Castor 1240-1270 • Mustard 1201-1261 • Bajri 420-485 • Rajgaro 1600-1829 • Weather: Clear Sky 32°C, Humidity 35%, Wind 12 km/h NW • No significant weather warnings.
             </motion.p>
           </div>
         </section>
