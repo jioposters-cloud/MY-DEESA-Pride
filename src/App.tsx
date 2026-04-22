@@ -79,7 +79,7 @@ export default function App() {
         return (
           <ExternalView 
             title="APMC Rates" 
-            url="https://www.mydeesa.in/2016/02/apmc.html" 
+            url="https://www.apmcdeesa.com/" 
             onBack={goBack} 
           />
         );

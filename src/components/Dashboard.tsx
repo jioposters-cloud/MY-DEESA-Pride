@@ -277,7 +277,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
               className="text-sm font-medium"
             >
-              APMC Deesa (17/04/2026): Castor 1240-1271 • Mustard 1200-1330 • Bajri 411-477 • Wheat 435-625 • Rajgaro 1600-1871 • Cumin 3300-3591 • Chana 1022-1039 • V.J. Patel (15/04/2026): Potato 100-270 • Onion 200-370 • Apple 2500-3050 • Tomato 100-180 • Bhildi (15/04/2026): Castor 1240-1270 • Mustard 1201-1261 • Bajri 420-485 • Rajgaro 1600-1829 • Weather: Clear Sky 32°C, Humidity 35%, Wind 12 km/h NW • No significant weather warnings.
+              APMC Deesa (22/04/2026): Castor 1220-1267 • Mustard 1200-1325 • Bajri 370-515 • Wheat 441-611 • Rajgaro 1465-1856 • Cumin 3600-3751 • Chana 1031-1044 • V.J. Patel (22/04/2026): Potato 100-220 • Onion 200-250 • Apple 1400-2420 • Tomato 200-370 • Bhildi (15/04/2026): Castor 1240-1270 • Mustard 1201-1261 • Bajri 420-485 • Rajgaro 1600-1829 • Weather: Clear Sky 34°C, Humidity 30%, Wind 15 km/h NW • No significant weather warnings.
             </motion.p>
           </div>
         </section>
