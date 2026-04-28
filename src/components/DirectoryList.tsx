@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, Search, Phone, MapPin, Globe, MessageCircle, 
@@ -58,6 +58,33 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
   const [activeCategory, setActiveCategory] = useState<string | null>(initialCategory || null);
   const [activeSubCategory, setActiveSubCategory] = useState<string>('All');
   const [showCategoriesModal, setShowCategoriesModal] = useState(false);
+  const categoriesRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Auto-scroll categories
+  useEffect(() => {
+    const el = categoriesRef.current;
+    if (!el || isPaused || categories.length <= 1) return;
+
+    let frameId: number;
+    const scroll = () => {
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
+        el.scrollLeft = 0;
+      } else {
+        el.scrollLeft += 0.5;
+      }
+      frameId = requestAnimationFrame(scroll);
+    };
+
+    const timeoutId = setTimeout(() => {
+      frameId = requestAnimationFrame(scroll);
+    }, 2000); // Start after 2s
+
+    return () => {
+      clearTimeout(timeoutId);
+      cancelAnimationFrame(frameId);
+    };
+  }, [isPaused, categories, screen]);
 
   // Sync with initialCategory prop
   useEffect(() => {
@@ -143,7 +170,14 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
                 View All &gt;
               </button>
             </div>
-            <div className="flex overflow-x-auto gap-4 pb-2 no-scrollbar">
+            <div 
+              ref={categoriesRef}
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+              onTouchStart={() => setIsPaused(true)}
+              onTouchEnd={() => setIsPaused(false)}
+              className="flex overflow-x-auto gap-4 pb-2 no-scrollbar scroll-smooth"
+            >
               {categories.map((cat) => (
                 <button
                   key={cat}
