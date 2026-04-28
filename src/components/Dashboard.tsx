@@ -3,13 +3,31 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
-  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail
+  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
 import { cn } from '../lib/utils';
 import AIChat from './AIChat';
 import CategoryIcon from './CategoryIcon';
+
+const BridgeIcon = (props: any) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M2 10h20M2 13h20" />
+    <path d="M7 13v6" strokeWidth="3" />
+    <path d="M17 13v6" strokeWidth="3" />
+    <path d="M2 7h20" strokeWidth="1" />
+    <path d="M5 7v3M12 7v3M19 7v3" strokeWidth="1" />
+  </svg>
+);
 
 interface DashboardProps {
   onNavigate: (screen: Screen, category?: string) => void;
@@ -46,6 +64,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
     { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
+    { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
   ];
 
   const handleCategoryClick = (cat: any) => {
