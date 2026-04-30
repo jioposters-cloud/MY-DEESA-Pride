@@ -86,7 +86,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
     { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
-    { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', screen: 'bridge' },
+    { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
     { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
     { id: 'game', name: 'Games', icon: Gamepad2, color: 'bg-violet-50 text-violet-700', screen: 'game' },
   ];
@@ -278,7 +278,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                 <SidebarItem 
                   icon={Waypoints} 
                   label="Bridge Corridor" 
-                  onClick={() => { onNavigate('bridge'); setIsSidebarOpen(false); }}
+                  onClick={() => { window.open('https://mydeesa-sdg.jioposters.workers.dev/', '_blank'); setIsSidebarOpen(false); }}
                 />
                 <div className="pt-6 mt-6 border-t border-gray-100">
                   <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Support & Info</p>
