@@ -4,7 +4,7 @@ import {
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
   ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints, Calendar,
-  Gamepad2, Bell
+  Gamepad2, Bell, Info
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
@@ -12,6 +12,8 @@ import { fetchLatestApmcRates } from '../services/geminiService';
 import { cn } from '../lib/utils';
 import AIChat from './AIChat';
 import CategoryIcon from './CategoryIcon';
+import { DirectoryCard } from './DirectoryCard';
+import { ImageGallery } from './ImageGallery';
 
 const BridgeIcon = (props: any) => (
   <svg
@@ -43,6 +45,9 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [highlightedItem, setHighlightedItem] = useState<DirectoryItem | null>(null);
+  const [galleryItem, setGalleryItem] = useState<DirectoryItem | null>(null);
+  const [selectedInfo, setSelectedInfo] = useState<string | null>(null);
   const [notifications] = useState([
     { id: 1, title: 'APMC Status', message: 'New market rates for Potato are updated.', time: '2 mins ago' },
     { id: 2, title: 'Weather Alert', message: 'Clear skies expected in Deesa today.', time: '1 hour ago' },
@@ -55,6 +60,17 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   useEffect(() => {
     async function loadData() {
       const data = await fetchDirectoryData();
+      
+      // Check for deep link
+      const params = new URLSearchParams(window.location.search);
+      const itemName = params.get('item');
+      if (itemName) {
+        const item = data.find(i => i.name === itemName);
+        if (item) {
+          setHighlightedItem(item);
+        }
+      }
+
       const featured = data.filter(item => item.category === 'Featured Spotlights');
       setFeaturedItems(featured);
       
@@ -537,6 +553,85 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       >
         <Plus className="w-8 h-8" />
       </button>
+
+      {/* Deep Link Highlight Modal */}
+      <AnimatePresence>
+        {highlightedItem && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setHighlightedItem(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 50 }}
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[2.5rem]"
+            >
+              <button 
+                onClick={() => setHighlightedItem(null)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-xl rounded-full text-white transition-all shadow-xl"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <DirectoryCard 
+                item={highlightedItem} 
+                onShowInfo={(info) => setSelectedInfo(info)}
+                onShowGallery={(item) => setGalleryItem(item)}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Info Modal */}
+      <AnimatePresence>
+        {selectedInfo && (
+          <div className="fixed inset-0 z-[210] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedInfo(null)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-3xl p-6 shadow-2xl"
+            >
+              <button 
+                onClick={() => setSelectedInfo(null)}
+                className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                  <Info className="w-5 h-5 text-blue-600" />
+                </div>
+                <h4 className="font-bold text-gray-900">Information</h4>
+              </div>
+              <p className="text-gray-600 leading-relaxed">{selectedInfo}</p>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Image Gallery Modal */}
+      <AnimatePresence>
+        {galleryItem && (
+          <ImageGallery 
+            images={galleryItem.images} 
+            onClose={() => setGalleryItem(null)} 
+            title={galleryItem.name}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

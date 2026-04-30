@@ -2,12 +2,14 @@ import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ArrowLeft, Search, Phone, MapPin, Globe, MessageCircle, 
-  CheckCircle2, Info, Loader2, Camera, X, Megaphone
+  CheckCircle2, Info, Loader2, Camera, X, Megaphone, Share2
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
 import { cn } from '../lib/utils';
 import CategoryIcon from './CategoryIcon';
+import { DirectoryCard } from './DirectoryCard';
+import { ImageGallery } from './ImageGallery';
 
 interface DirectoryListProps {
   screen: Screen;
@@ -22,11 +24,22 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedInfo, setSelectedInfo] = useState<string | null>(null);
   const [galleryItem, setGalleryItem] = useState<DirectoryItem | null>(null);
+  const [highlightedItem, setHighlightedItem] = useState<DirectoryItem | null>(null);
 
   useEffect(() => {
     async function loadData() {
       setLoading(true);
       const data = await fetchDirectoryData();
+      
+      // Check for deep link
+      const params = new URLSearchParams(window.location.search);
+      const itemName = params.get('item');
+      if (itemName) {
+        const item = data.find(i => i.name === itemName);
+        if (item) {
+          setHighlightedItem(item);
+        }
+      }
       
       // Filter based on screen
       const filtered = data.filter(item => {
@@ -370,237 +383,39 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
           />
         )}
       </AnimatePresence>
+
+      {/* Deep Link Highlight Modal */}
+      <AnimatePresence>
+        {highlightedItem && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setHighlightedItem(null)}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 50 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 50 }}
+              className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[2.5rem]"
+            >
+              <button 
+                onClick={() => setHighlightedItem(null)}
+                className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-xl rounded-full text-white transition-all shadow-xl"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <DirectoryCard 
+                item={highlightedItem} 
+                onShowInfo={(info) => setSelectedInfo(info)}
+                onShowGallery={(item) => setGalleryItem(item)}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
-const ImageGallery: React.FC<{ images: string[], onClose: () => void, title: string }> = ({ images, onClose, title }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const next = () => setCurrentIndex((prev) => (prev + 1) % images.length);
-  const prev = () => setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-
-  return (
-    <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-md">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        className="relative w-full h-full flex flex-col"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 text-white z-10">
-          <div className="flex flex-col">
-            <h3 className="font-black text-lg uppercase tracking-tight">{title}</h3>
-            <span className="text-[10px] font-bold text-white/60 uppercase tracking-widest">
-              Image {currentIndex + 1} of {images.length}
-            </span>
-          </div>
-          <button 
-            onClick={onClose}
-            className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        {/* Main Image Area */}
-        <div className="flex-1 relative flex items-center justify-center overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.img
-              key={currentIndex}
-              src={images[currentIndex]}
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="max-w-full max-h-full object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </AnimatePresence>
-
-          {/* Navigation Arrows */}
-          {images.length > 1 && (
-            <>
-              <button 
-                onClick={(e) => { e.stopPropagation(); prev(); }}
-                className="absolute left-4 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-sm"
-              >
-                <ArrowLeft className="w-6 h-6" />
-              </button>
-              <button 
-                onClick={(e) => { e.stopPropagation(); next(); }}
-                className="absolute right-4 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all backdrop-blur-sm"
-              >
-                <motion.div style={{ rotate: 180 }}>
-                  <ArrowLeft className="w-6 h-6" />
-                </motion.div>
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Thumbnails */}
-        {images.length > 1 && (
-          <div className="p-6 flex justify-center gap-3">
-            {images.map((img, idx) => (
-              <button
-                key={idx}
-                onClick={() => setCurrentIndex(idx)}
-                className={cn(
-                  "w-16 h-16 rounded-xl overflow-hidden border-2 transition-all",
-                  currentIndex === idx ? "border-[#fedf36] scale-110" : "border-transparent opacity-40"
-                )}
-              >
-                <img src={img} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-              </button>
-            ))}
-          </div>
-        )}
-      </motion.div>
-    </div>
-  );
-};
-
-const DirectoryCard: React.FC<{ item: DirectoryItem, onShowInfo: (info: string) => void, onShowGallery: (item: DirectoryItem) => void }> = ({ item, onShowInfo, onShowGallery }) => {
-  const hasImage = item.images.length > 0;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl overflow-hidden shadow-sm ring-1 ring-black/5 flex flex-col h-full"
-    >
-      {/* Image Header */}
-      {hasImage && (
-        <div 
-          onClick={() => onShowGallery(item)}
-          className="relative h-56 w-full group border-b-4 border-[#fedf36] cursor-pointer"
-        >
-          <img 
-            src={item.images[0]} 
-            alt={item.name} 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2">
-            <Camera className="w-3 h-3" />
-            View Gallery ({item.images.length})
-          </div>
-        </div>
-      )}
-
-      <div className="p-5 flex flex-col flex-1 space-y-4">
-        {/* Title & Badges */}
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-black tracking-tight text-gray-900 uppercase">{item.name}</h3>
-            {item.verified && (
-              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-[#00a3ff] bg-white shadow-sm">
-                <CheckCircle2 className="w-4 h-4 fill-[#00a3ff] text-white" />
-                <span className="text-[11px] font-black text-[#00a3ff] tracking-tight">VERIFIED</span>
-              </div>
-            )}
-            {item.info && (
-              <button 
-                onClick={() => onShowInfo(item.info)}
-                className="text-gray-400 hover:text-[#00a3ff] transition-colors"
-              >
-                <div className="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center">
-                  <span className="text-[10px] font-serif italic font-black leading-none">i</span>
-                </div>
-              </button>
-            )}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            <span className="bg-[#fedf36] text-[#211b00] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
-              {item.category}
-            </span>
-          </div>
-
-          {item.info && (item.verified ? (
-            <div className="bg-[#fedf36] rounded-lg py-1.5 px-3 overflow-hidden relative shadow-sm">
-              <div className="flex items-center gap-8 whitespace-nowrap animate-marquee w-max min-w-full">
-                <div className="flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700] flex-shrink-0" />
-                  <span className="text-[11px] font-bold text-[#211b00] uppercase tracking-tight">{item.info}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700] flex-shrink-0" />
-                  <span className="text-[11px] font-bold text-[#211b00] uppercase tracking-tight">{item.info}</span>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-[#fedf36] rounded-lg p-2 flex items-center gap-2 shadow-sm">
-              <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700]" />
-              <span className="text-[11px] font-bold text-[#211b00] uppercase truncate">{item.tag || item.info}</span>
-            </div>
-          )) || item.tag && (
-            <div className="bg-[#fedf36] rounded-lg p-2 flex items-center gap-2 shadow-sm">
-              <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700]" />
-              <span className="text-[11px] font-bold text-[#211b00] uppercase truncate">{item.tag}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Details */}
-        <div className="space-y-2 text-sm pt-2 border-t border-gray-50">
-          <div className="flex gap-2">
-            <span className="font-bold text-gray-400 min-w-[60px]">Service:</span>
-            <span className="text-gray-600 font-medium">{item.subCategory}</span>
-          </div>
-          {item.location && (
-            <div className="flex gap-2">
-              <span className="font-bold text-gray-400 min-w-[60px]">Loc:</span>
-              <div className="flex-1 flex items-start justify-between gap-2">
-                <span className="text-gray-600 font-medium leading-snug">{item.location}</span>
-                {item.mapPin && (
-                  <a href={item.mapPin} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:scale-110 transition-transform flex-shrink-0">
-                    <MapPin className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="pt-2 space-y-2 mt-auto">
-          <div className="grid grid-cols-2 gap-2">
-            {item.mobile && (
-              <a 
-                href={`tel:${item.mobile}`} 
-                className="flex items-center justify-center gap-2 py-3 bg-[#ff4422] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-red-500/10"
-              >
-                <Phone className="w-4 h-4 fill-white" />
-                Call
-              </a>
-            )}
-            {item.whatsapp && (
-              <a 
-                href={`https://wa.me/${item.whatsapp}`} 
-                className="flex items-center justify-center gap-2 py-3 bg-[#25d366] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-green-500/10"
-              >
-                <MessageCircle className="w-4 h-4 fill-white" />
-                WhatsApp
-              </a>
-            )}
-          </div>
-          {item.website && (
-            <a 
-              href={item.website} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center justify-center gap-2 py-3 bg-[#222222] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-black/10"
-            >
-              <Globe className="w-4 h-4" />
-              Website
-            </a>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-};
