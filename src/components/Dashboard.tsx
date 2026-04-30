@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
-  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints
+  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints, Calendar
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
@@ -65,6 +65,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
     { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
+    { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
   ];
 
   const handleCategoryClick = (cat: any) => {
@@ -190,6 +191,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   icon={Home} 
                   label="Real Estate" 
                   onClick={() => { onNavigate('realestate'); setIsSidebarOpen(false); }}
+                />
+                <SidebarItem 
+                  icon={Calendar} 
+                  label="Events" 
+                  onClick={() => { onNavigate('events'); setIsSidebarOpen(false); }}
                 />
                 <div className="pt-6 mt-6 border-t border-gray-100">
                   <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Support & Info</p>
@@ -328,30 +334,54 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </button>
           </div>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-y-6 gap-x-4">
-            {categories.map((cat) => (
-              <motion.button
-                key={cat.id}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handleCategoryClick(cat)}
-                className="flex flex-col items-center gap-3 group relative"
-              >
-                <div className="relative">
-                  {cat.id === 'phonebook' && (
-                    <>
-                      <div className="absolute inset-0 bg-[#b71700]/20 rounded-full animate-pulse-wave" />
-                      <div className="absolute inset-0 bg-[#b71700]/10 rounded-full animate-pulse-wave [animation-delay:0.5s]" />
-                    </>
-                  )}
-                  <div className={cn(
-                    "w-20 h-20 rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm relative z-10",
-                    cat.color
-                  )}>
-                    <cat.icon className="w-12 h-12" />
+            {categories.map((cat) => {
+              const content = (
+                <motion.div
+                  whileTap={{ scale: 0.95 }}
+                  className="flex flex-col items-center gap-3 group relative cursor-pointer"
+                >
+                  <div className="relative">
+                    {cat.id === 'phonebook' && (
+                      <>
+                        <div className="absolute inset-0 bg-[#b71700]/20 rounded-full animate-pulse-wave" />
+                        <div className="absolute inset-0 bg-[#b71700]/10 rounded-full animate-pulse-wave [animation-delay:0.5s]" />
+                      </>
+                    )}
+                    <div className={cn(
+                      "w-20 h-20 rounded-full flex items-center justify-center transition-all group-hover:brightness-95 shadow-sm relative z-10",
+                      cat.color
+                    )}>
+                      <cat.icon className="w-12 h-12" />
+                    </div>
                   </div>
-                </div>
-                <span className="text-[11px] font-bold text-center text-gray-600 uppercase tracking-tight leading-tight">{cat.name}</span>
-              </motion.button>
-            ))}
+                  <span className="text-[11px] font-bold text-center text-gray-600 uppercase tracking-tight leading-tight">{cat.name}</span>
+                </motion.div>
+              );
+
+              if (cat.url) {
+                return (
+                  <a 
+                    key={cat.id} 
+                    href={cat.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block shadow-none hover:shadow-none"
+                  >
+                    {content}
+                  </a>
+                );
+              }
+
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryClick(cat)}
+                  className="block"
+                >
+                  {content}
+                </button>
+              );
+            })}
           </div>
         </section>
 

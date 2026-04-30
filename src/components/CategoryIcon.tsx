@@ -3,7 +3,7 @@ import {
   Calculator, Scale, Tractor, Car, Landmark, Stethoscope, 
   HardHat, Key, Snowflake, Monitor, Utensils, Briefcase, 
   Home, Cloud, ShoppingBag, Contact, Compass, GraduationCap, 
-  Scissors, Zap, Plane, Camera, 
+  Scissors, Zap, Plane, Camera, Calendar,
   Music, Film, Coffee, Truck, Wrench, Heart, ShoppingCart
 } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -50,6 +50,7 @@ export const getCategoryIcon = (category: string) => {
   if (cat.includes('electronic') || cat.includes('electric') || cat.includes('mobile')) return Zap;
   if (cat.includes('travel') || cat.includes('tour') || cat.includes('bus') || cat.includes('taxi')) return Plane;
   if (cat.includes('photo') || cat.includes('video') || cat.includes('studio')) return Camera;
+  if (cat.includes('event') || cat.includes('wedding') || cat.includes('party')) return Calendar;
   if (cat.includes('music') || cat.includes('dj') || cat.includes('sound')) return Music;
   if (cat.includes('film') || cat.includes('cinema') || cat.includes('theater')) return Film;
   if (cat.includes('coffee') || cat.includes('tea')) return Coffee;

@@ -57,6 +57,7 @@ export default function App() {
       case 'jobs':
       case 'food':
       case 'realestate':
+      case 'events':
         return (
           <DirectoryList 
             screen={currentScreen} 
