@@ -579,7 +579,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   setHighlightedItem(null);
                   window.history.replaceState({}, '', window.location.pathname);
                 }}
-                className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-xl rounded-full text-white transition-all shadow-xl"
+                className="absolute top-6 right-6 z-20 p-2 bg-[#b71700] hover:bg-red-700 rounded-full text-white transition-all shadow-xl active:scale-95"
               >
                 <X className="w-6 h-6" />
               </button>
