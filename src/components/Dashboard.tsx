@@ -75,7 +75,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     loadTicker();
   }, []);
 
-  const categories = [
+  const categories: { id: string; name: string; icon: any; color: string; screen?: string; url?: string; }[] = [
     { id: 'phonebook', name: 'Phonebook', icon: Contact, color: 'bg-red-50 text-[#b71700]', screen: 'phonebook' },
     { id: 'rental', name: 'Rental', icon: Key, color: 'bg-yellow-50 text-[#6d5e00]', screen: 'rental' },
     { id: 'property', name: 'Property', icon: Building2, color: 'bg-blue-50 text-blue-700', screen: 'property' },
@@ -86,7 +86,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
     { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
-    { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
+    { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', screen: 'bridge' },
     { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
     { id: 'game', name: 'Games', icon: Gamepad2, color: 'bg-violet-50 text-violet-700', screen: 'game' },
   ];
@@ -274,6 +274,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   icon={Gamepad2} 
                   label="Games" 
                   onClick={() => { onNavigate('game'); setIsSidebarOpen(false); }}
+                />
+                <SidebarItem 
+                  icon={Waypoints} 
+                  label="Bridge Corridor" 
+                  onClick={() => { onNavigate('bridge'); setIsSidebarOpen(false); }}
                 />
                 <div className="pt-6 mt-6 border-t border-gray-100">
                   <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Support & Info</p>

@@ -84,6 +84,14 @@ export default function App() {
             onBack={goBack} 
           />
         );
+      case 'bridge':
+        return (
+          <ExternalView 
+            title="Deesa Bridge Corridor" 
+            url="https://mydeesa-sdg.jioposters.workers.dev/" 
+            onBack={goBack} 
+          />
+        );
       case 'apmc':
         return (
           <ExternalView 
