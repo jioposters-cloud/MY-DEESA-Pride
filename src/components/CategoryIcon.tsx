@@ -4,9 +4,31 @@ import {
   HardHat, Key, Snowflake, Monitor, Utensils, Briefcase, 
   Home, Cloud, ShoppingBag, Contact, Compass, GraduationCap, 
   Scissors, Zap, Plane, Camera, Calendar,
-  Music, Film, Coffee, Truck, Wrench, Heart, ShoppingCart
+  Music, Film, Coffee, Truck, Wrench, Heart, ShoppingCart,
+  Settings, IdCard
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+
+const ComputerServiceIcon = ({ className }: { className?: string }) => (
+  <div className={cn("relative", className)}>
+    <Monitor className="absolute inset-0 w-full h-full" />
+    <Settings className="absolute -bottom-1 -right-1 w-1/2 h-1/2" />
+  </div>
+);
+
+const DrivingSchoolIcon = ({ className }: { className?: string }) => (
+  <div className={cn("relative", className)}>
+    <Car className="absolute inset-0 w-full h-full" />
+    <GraduationCap className="absolute -top-2 -right-2 w-1/2 h-1/2" />
+  </div>
+);
+
+const DrivingLicenceIcon = ({ className }: { className?: string }) => (
+  <div className={cn("relative", className)}>
+    <Car className="absolute inset-0 w-full h-full" />
+    <IdCard className="absolute -bottom-1 -right-1 w-1/2 h-1/2" />
+  </div>
+);
 
 interface CategoryIconProps {
   category: string;
@@ -28,6 +50,12 @@ const colorSchemes = [
 
 export const getCategoryIcon = (category: string) => {
   const cat = category.toLowerCase();
+  
+  // Specific matches first
+  if (cat.includes('driving school')) return DrivingSchoolIcon;
+  if (cat.includes('licence')) return DrivingLicenceIcon;
+  if (cat.includes('computer service')) return ComputerServiceIcon;
+
   if (cat.includes('accountant') || cat.includes('c.a') || cat.includes('tax')) return Calculator;
   if (cat.includes('advocate') || cat.includes('lawyer') || cat.includes('legal')) return Scale;
   if (cat.includes('agriculture') || cat.includes('farm') || cat.includes('tractor')) return Tractor;

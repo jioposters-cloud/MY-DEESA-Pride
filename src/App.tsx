@@ -76,6 +76,14 @@ export default function App() {
             onBack={goBack} 
           />
         );
+      case 'game':
+        return (
+          <ExternalView 
+            title="My Deesa Games" 
+            url="https://potato-games.jioposters.workers.dev/" 
+            onBack={goBack} 
+          />
+        );
       case 'apmc':
         return (
           <ExternalView 

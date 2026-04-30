@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
-  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints, Calendar
+  ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints, Calendar,
+  Gamepad2, Bell
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
+import { fetchLatestApmcRates } from '../services/geminiService';
 import { cn } from '../lib/utils';
 import AIChat from './AIChat';
 import CategoryIcon from './CategoryIcon';
@@ -40,6 +42,15 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [notifications] = useState([
+    { id: 1, title: 'APMC Status', message: 'New market rates for Potato are updated.', time: '2 mins ago' },
+    { id: 2, title: 'Weather Alert', message: 'Clear skies expected in Deesa today.', time: '1 hour ago' },
+    { id: 3, title: 'New Event', message: 'Summer Cricket Tournament entries open.', time: '3 hours ago' },
+    { id: 4, title: 'Business Update', message: '5 new rentals added in Deesa vicinity.', time: '5 hours ago' },
+    { id: 5, title: 'App Update', message: 'Game zone is now live in MyDeesa!', time: 'Yesterday' },
+  ]);
+  const [tickerData, setTickerData] = useState<string>("APMC Deesa: Loading latest rates... • Stay tuned • Refresh for updates.");
 
   useEffect(() => {
     async function loadData() {
@@ -50,7 +61,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       const cats = Array.from(new Set(data.map(item => item.category))).sort();
       setAllCategories(cats);
     }
+    
+    async function loadTicker() {
+      try {
+        const rates = await fetchLatestApmcRates();
+        setTickerData(rates);
+      } catch (err) {
+        console.error("Failed to load ticker:", err);
+      }
+    }
+
     loadData();
+    loadTicker();
   }, []);
 
   const categories = [
@@ -66,6 +88,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
     { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
     { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
+    { id: 'game', name: 'Games', icon: Gamepad2, color: 'bg-violet-50 text-violet-700', screen: 'game' },
   ];
 
   const handleCategoryClick = (cat: any) => {
@@ -80,6 +103,56 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     <div className="min-h-screen bg-[#f8f9ff] pb-28">
       <AIChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
       
+      {/* Notification Modal */}
+      <AnimatePresence>
+        {isNotificationOpen && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsNotificationOpen(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-[2rem] shadow-2xl overflow-hidden flex flex-col"
+            >
+              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-[#b71700] text-white">
+                <div>
+                  <h3 className="text-xl font-black tracking-tighter uppercase">Notifications</h3>
+                  <p className="text-[10px] font-bold uppercase tracking-widest opacity-70">Stay Updated</p>
+                </div>
+                <button 
+                  onClick={() => setIsNotificationOpen(false)}
+                  className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+                {notifications.map(notif => (
+                  <div key={notif.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:bg-red-50 transition-colors">
+                    <div className="flex justify-between items-start mb-1">
+                      <h4 className="text-xs font-black text-[#b71700] uppercase tracking-tight">{notif.title}</h4>
+                      <span className="text-[9px] font-bold text-gray-400 uppercase">{notif.time}</span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-snug">{notif.message}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="p-4 bg-gray-50 text-center">
+                <button className="text-[10px] font-bold text-[#b71700] uppercase tracking-widest hover:underline">
+                  Clear All Notifications
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Category Modal */}
       <AnimatePresence>
         {isCategoryModalOpen && (
@@ -197,6 +270,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   label="Events" 
                   onClick={() => { onNavigate('events'); setIsSidebarOpen(false); }}
                 />
+                <SidebarItem 
+                  icon={Gamepad2} 
+                  label="Games" 
+                  onClick={() => { onNavigate('game'); setIsSidebarOpen(false); }}
+                />
                 <div className="pt-6 mt-6 border-t border-gray-100">
                   <p className="px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Support & Info</p>
                   <SidebarItem icon={Phone} label="Contact Us" onClick={() => window.open('tel:+919924510101', '_self')} />
@@ -284,9 +362,18 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             </button>
             <h1 className="text-xl font-black tracking-tighter text-[#b71700]">MyDeesa</h1>
           </div>
-          <button className="text-[#b71700] p-2 hover:bg-gray-100 rounded-full transition-colors">
-            <Search className="w-6 h-6" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button 
+              onClick={() => setIsNotificationOpen(true)}
+              className="text-[#b71700] p-2 hover:bg-gray-100 rounded-full transition-colors relative"
+            >
+              <Bell className="w-6 h-6" />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-yellow-400 border-2 border-white rounded-full"></span>
+            </button>
+            <button className="text-[#b71700] p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <Search className="w-6 h-6" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -298,11 +385,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           </span>
           <div className="whitespace-nowrap overflow-hidden">
             <motion.p 
-              animate={{ x: [0, -1500] }}
-              transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+              animate={{ x: [0, -2000] }}
+              transition={{ duration: 70, repeat: Infinity, ease: "linear" }}
               className="text-sm font-medium"
             >
-              APMC Deesa (22/04/2026): Castor 1220-1267 • Mustard 1200-1325 • Bajri 370-515 • Wheat 441-611 • Rajgaro 1465-1856 • Cumin 3600-3751 • Chana 1031-1044 • V.J. Patel (22/04/2026): Potato 100-220 • Onion 200-250 • Apple 1400-2420 • Tomato 200-370 • Bhildi (15/04/2026): Castor 1240-1270 • Mustard 1201-1261 • Bajri 420-485 • Rajgaro 1600-1829 • Weather: Clear Sky 34°C, Humidity 30%, Wind 15 km/h NW • No significant weather warnings.
+              {tickerData}
             </motion.p>
           </div>
         </section>
