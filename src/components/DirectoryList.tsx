@@ -392,7 +392,10 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setHighlightedItem(null)}
+              onClick={() => {
+                setHighlightedItem(null);
+                window.history.replaceState({}, '', window.location.pathname);
+              }}
               className="absolute inset-0 bg-black/80 backdrop-blur-md"
             />
             <motion.div 
@@ -402,7 +405,10 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
               className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-[2.5rem]"
             >
               <button 
-                onClick={() => setHighlightedItem(null)}
+                onClick={() => {
+                  setHighlightedItem(null);
+                  window.history.replaceState({}, '', window.location.pathname);
+                }}
                 className="absolute top-4 right-4 z-10 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-xl rounded-full text-white transition-all shadow-xl"
               >
                 <X className="w-6 h-6" />
