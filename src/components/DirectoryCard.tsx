@@ -9,11 +9,12 @@ import { cn } from '../lib/utils';
 
 interface DirectoryCardProps {
   item: DirectoryItem;
+  isDarkMode?: boolean;
   onShowInfo: (info: string) => void;
   onShowGallery: (item: DirectoryItem) => void;
 }
 
-export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, onShowInfo, onShowGallery }) => {
+export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, isDarkMode, onShowInfo, onShowGallery }) => {
   const hasImage = item.images.length > 0;
 
   const handleShare = async (e: React.MouseEvent) => {
@@ -45,25 +46,41 @@ export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, onShowInfo, 
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl overflow-hidden shadow-sm ring-1 ring-black/5 flex flex-col h-full"
+      className={cn(
+        "rounded-3xl overflow-hidden flex flex-col h-full transition-all duration-500",
+        isDarkMode 
+          ? "bg-[#121212] ring-1 ring-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.4)]" 
+          : "bg-white shadow-sm ring-1 ring-black/5"
+      )}
     >
       {/* Image Header */}
       {hasImage && (
         <div 
           onClick={() => onShowGallery(item)}
-          className="relative h-56 w-full group border-b-4 border-[#fedf36] cursor-pointer"
+          className={cn(
+            "relative h-56 w-full group cursor-pointer overflow-hidden",
+            isDarkMode ? "border-b border-white/10" : "border-b-4 border-[#fedf36]"
+          )}
         >
           <img 
             src={item.images[0]} 
             alt={item.name} 
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             referrerPolicy="no-referrer"
           />
-          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2">
+          {isDarkMode && (
+            <div className="absolute inset-0 bg-gradient-to-t from-[#121212] via-transparent to-transparent opacity-60" />
+          )}
+          <div className="absolute bottom-3 right-3 bg-black/60 backdrop-blur-md text-white px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-white/10">
             <Camera className="w-3 h-3" />
-            View Gallery ({item.images.length})
+            Gallery ({item.images.length})
           </div>
         </div>
+      )}
+
+      {/* Dynamic Border Accent for Dark Mode */}
+      {isDarkMode && !hasImage && (
+        <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-purple-500 to-red-500" />
       )}
 
       <div className="p-5 flex flex-col flex-1 space-y-4">
@@ -71,20 +88,34 @@ export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, onShowInfo, 
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-lg font-black tracking-tight text-gray-900 uppercase">{item.name}</h3>
+              <h3 className={cn(
+                "text-lg font-black tracking-tight uppercase",
+                isDarkMode ? "text-white" : "text-gray-900"
+              )}>{item.name}</h3>
               {item.verified && (
-                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-[#00a3ff] bg-white shadow-sm">
-                  <CheckCircle2 className="w-4 h-4 fill-[#00a3ff] text-white" />
-                  <span className="text-[11px] font-black text-[#00a3ff] tracking-tight">VERIFIED</span>
+                <div className={cn(
+                  "flex items-center gap-1.5 px-2 py-0.5 rounded border shadow-sm",
+                  isDarkMode 
+                    ? "border-blue-500/50 bg-blue-500/10 text-blue-400" 
+                    : "border-[#00a3ff] bg-white text-[#00a3ff]"
+                )}>
+                  <CheckCircle2 className={cn("w-4 h-4", isDarkMode ? "fill-blue-400 text-[#121212]" : "fill-[#00a3ff] text-white")} />
+                  <span className="text-[11px] font-black tracking-tight">VERIFIED</span>
                 </div>
               )}
               {item.info && (
                 <button 
-                  onClick={() => onShowInfo(item.info)}
-                  className="text-gray-400 hover:text-[#00a3ff] transition-colors"
+                  onClick={() => onShowInfo(item.info!)}
+                  className={cn(
+                    "transition-colors rounded-full p-0.5",
+                    isDarkMode ? "text-blue-400 hover:bg-blue-400/10" : "text-gray-400 hover:text-[#00a3ff]"
+                  )}
                 >
-                  <div className="w-6 h-6 rounded-full border border-gray-400 flex items-center justify-center">
-                    <span className="text-[10px] font-serif italic font-black leading-none">i</span>
+                  <div className={cn(
+                    "w-5 h-5 rounded-full border flex items-center justify-center",
+                    isDarkMode ? "border-blue-400/50" : "border-gray-400"
+                  )}>
+                    <span className="text-[9px] font-serif italic font-black leading-none">i</span>
                   </div>
                 </button>
               )}
@@ -92,55 +123,84 @@ export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, onShowInfo, 
             
             <button 
               onClick={handleShare}
-              className="p-2 text-gray-400 hover:text-[#b71700] hover:bg-red-50 rounded-full transition-all active:scale-90"
+              className={cn(
+                "p-2 rounded-full transition-all active:scale-90",
+                isDarkMode 
+                  ? "text-gray-400 hover:text-white hover:bg-white/10" 
+                  : "text-gray-400 hover:text-[#b71700] hover:bg-red-50"
+              )}
             >
               <Share2 className="w-5 h-5" />
             </button>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className="bg-[#fedf36] text-[#211b00] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider">
+            <span className={cn(
+              "text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest",
+              isDarkMode 
+                ? "bg-gradient-to-r from-blue-600/20 to-purple-600/20 text-blue-300 border border-blue-500/20" 
+                : "bg-[#fedf36] text-[#211b00]"
+            )}>
               {item.category}
             </span>
           </div>
 
           {item.info && (item.verified ? (
-            <div className="bg-[#fedf36] rounded-lg py-1.5 px-3 overflow-hidden relative shadow-sm">
+            <div className={cn(
+              "rounded-lg py-1.5 px-3 overflow-hidden relative shadow-sm",
+              isDarkMode ? "bg-red-500/10 border border-red-500/20" : "bg-[#fedf36]"
+            )}>
               <div className="flex items-center gap-8 whitespace-nowrap animate-marquee w-max min-w-full">
-                <div className="flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700] flex-shrink-0" />
-                  <span className="text-[11px] font-bold text-[#211b00] uppercase tracking-tight">{item.info}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700] flex-shrink-0" />
-                  <span className="text-[11px] font-bold text-[#211b00] uppercase tracking-tight">{item.info}</span>
-                </div>
+                {[1, 2].map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Megaphone className={cn("w-4 h-4 flex-shrink-0", isDarkMode ? "text-red-400" : "text-[#b71700] fill-[#b71700]")} />
+                    <span className={cn(
+                      "text-[11px] font-bold uppercase tracking-tight",
+                      isDarkMode ? "text-red-400" : "text-[#211b00]"
+                    )}>{item.info}</span>
+                  </div>
+                ))}
               </div>
             </div>
           ) : (
-            <div className="bg-[#fedf36] rounded-lg p-2 flex items-center gap-2 shadow-sm">
-              <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700]" />
-              <span className="text-[11px] font-bold text-[#211b00] uppercase truncate">{item.tag || item.info}</span>
+            <div className={cn(
+              "rounded-lg p-2 flex items-center gap-2 shadow-sm",
+              isDarkMode ? "bg-white/5 border border-white/10" : "bg-[#fedf36]"
+            )}>
+              <Megaphone className={cn("w-4 h-4", isDarkMode ? "text-gray-400" : "text-[#b71700] fill-[#b71700]")} />
+              <span className={cn(
+                "text-[11px] font-bold truncate",
+                isDarkMode ? "text-gray-400" : "text-[#211b00]"
+              )}>{item.tag || item.info}</span>
             </div>
           )) || item.tag && (
-            <div className="bg-[#fedf36] rounded-lg p-2 flex items-center gap-2 shadow-sm">
-              <Megaphone className="w-4 h-4 text-[#b71700] fill-[#b71700]" />
-              <span className="text-[11px] font-bold text-[#211b00] uppercase truncate">{item.tag}</span>
+            <div className={cn(
+              "rounded-lg p-2 flex items-center gap-2 shadow-sm",
+              isDarkMode ? "bg-white/5 border border-white/10" : "bg-[#fedf36]"
+            )}>
+              <Megaphone className={cn("w-4 h-4", isDarkMode ? "text-gray-400" : "text-[#b71700] fill-[#b71700]")} />
+              <span className={cn(
+                "text-[11px] font-bold truncate",
+                isDarkMode ? "text-gray-400" : "text-[#211b00]"
+              )}>{item.tag}</span>
             </div>
           )}
         </div>
 
-        {/* Details */}
-        <div className="space-y-2 text-sm pt-2 border-t border-gray-50">
+        {/* Details Section */}
+        <div className={cn(
+          "space-y-2 text-sm pt-4 border-t transition-colors",
+          isDarkMode ? "border-white/5" : "border-gray-50"
+        )}>
           <div className="flex gap-2">
-            <span className="font-bold text-gray-400 min-w-[60px]">Service:</span>
-            <span className="text-gray-600 font-medium">{item.subCategory}</span>
+            <span className={cn("font-bold min-w-[60px]", isDarkMode ? "text-gray-600" : "text-gray-400")}>Service:</span>
+            <span className={cn("font-medium", isDarkMode ? "text-gray-300" : "text-gray-600")}>{item.subCategory}</span>
           </div>
           {item.location && (
             <div className="flex gap-2">
-              <span className="font-bold text-gray-400 min-w-[60px]">Loc:</span>
+              <span className={cn("font-bold min-w-[60px]", isDarkMode ? "text-gray-600" : "text-gray-400")}>Loc:</span>
               <div className="flex-1 flex items-start justify-between gap-2">
-                <span className="text-gray-600 font-medium leading-snug">{item.location}</span>
+                <span className={cn("font-medium leading-snug", isDarkMode ? "text-gray-400" : "text-gray-600")}>{item.location}</span>
                 {item.mapPin && (
                   <a href={item.mapPin} target="_blank" rel="noopener noreferrer" className="text-red-500 hover:scale-110 transition-transform flex-shrink-0">
                     <MapPin className="w-4 h-4" />
@@ -151,24 +211,34 @@ export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, onShowInfo, 
           )}
         </div>
 
-        {/* Action Buttons */}
+        {/* Improved Action Buttons */}
         <div className="pt-2 space-y-2 mt-auto">
           <div className="grid grid-cols-2 gap-2">
             {item.mobile && (
               <a 
                 href={`tel:${item.mobile}`} 
-                className="flex items-center justify-center gap-2 py-3 bg-[#ff4422] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-red-500/10"
+                className={cn(
+                  "flex items-center justify-center gap-2 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg",
+                  isDarkMode 
+                    ? "bg-[#ff4422]/10 border border-[#ff4422]/30 text-[#ff4422] shadow-red-500/5 hover:bg-[#ff4422]/20" 
+                    : "bg-[#ff4422] text-white shadow-red-500/10"
+                )}
               >
-                <Phone className="w-4 h-4 fill-white" />
+                <Phone className={cn("w-4 h-4", isDarkMode ? "text-[#ff4422]" : "fill-white")} />
                 Call
               </a>
             )}
             {item.whatsapp && (
               <a 
                 href={`https://wa.me/${item.whatsapp}`} 
-                className="flex items-center justify-center gap-2 py-3 bg-[#25d366] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-green-500/10"
+                className={cn(
+                  "flex items-center justify-center gap-2 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg",
+                  isDarkMode 
+                    ? "bg-green-500/10 border border-green-500/30 text-green-400 shadow-green-500/5 hover:bg-green-500/20" 
+                    : "bg-[#25d366] text-white shadow-green-500/10"
+                )}
               >
-                <MessageCircle className="w-4 h-4 fill-white" />
+                <MessageCircle className={cn("w-4 h-4", isDarkMode ? "text-green-400" : "fill-white")} />
                 WhatsApp
               </a>
             )}
@@ -178,9 +248,14 @@ export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, onShowInfo, 
               href={item.website} 
               target="_blank" 
               rel="noopener noreferrer" 
-              className="flex items-center justify-center gap-2 py-3 bg-[#222222] text-white rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg shadow-black/10"
+              className={cn(
+                "flex items-center justify-center gap-2 py-3 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all active:scale-95 shadow-lg",
+                isDarkMode 
+                  ? "bg-white/5 border border-white/10 text-white hover:bg-white/10" 
+                  : "bg-[#222222] text-white shadow-black/10"
+              )}
             >
-              <Globe className="w-4 h-4" />
+              <Globe className="w-4 h-4 text-white" />
               Website
             </a>
           )}

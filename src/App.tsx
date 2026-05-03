@@ -58,12 +58,14 @@ export default function App() {
       case 'food':
       case 'realestate':
       case 'events':
+      case 'phonebook-dark':
         return (
           <DirectoryList 
-            screen={currentScreen} 
+            screen={currentScreen === 'phonebook-dark' ? 'phonebook' : currentScreen} 
             onBack={goBack} 
             initialCategory={initialCategory} 
             onCategoryChange={(cat) => setInitialCategory(cat)}
+            forceDarkMode={currentScreen === 'phonebook-dark'}
           />
         );
       case 'explore':

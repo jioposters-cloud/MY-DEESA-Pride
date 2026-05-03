@@ -4,7 +4,7 @@ import {
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
   ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints, Calendar,
-  Gamepad2, Bell, Info
+  Gamepad2, Bell, Info, Moon
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
@@ -105,6 +105,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
     { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
     { id: 'game', name: 'Games', icon: Gamepad2, color: 'bg-violet-50 text-violet-700', screen: 'game' },
+    { id: 'phonebook-dark', name: 'Dark Phonebook', icon: Moon, color: 'bg-slate-900 text-white', screen: 'phonebook-dark' },
   ];
 
   const handleCategoryClick = (cat: any) => {
