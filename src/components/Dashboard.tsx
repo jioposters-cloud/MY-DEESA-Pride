@@ -106,6 +106,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
     { id: 'game', name: 'Games', icon: Gamepad2, color: 'bg-violet-50 text-violet-700', screen: 'game' },
     { id: 'phonebook-dark', name: 'Dark Phonebook', icon: Moon, color: 'bg-slate-900 text-white', screen: 'phonebook-dark' },
+    { id: 'add-business', name: 'Add Business', icon: Building2, color: 'bg-white text-[#b71700] ring-2 ring-[#b71700]/5', url: 'https://forms.gle/qq23MUr12Gn3kqPAA' },
   ];
 
   const handleCategoryClick = (cat: any) => {
