@@ -193,12 +193,12 @@ export const DirectoryCard: React.FC<DirectoryCardProps> = ({ item, isDarkMode, 
           isDarkMode ? "border-white/5" : "border-gray-50"
         )}>
           <div className="flex gap-2">
-            <span className={cn("font-bold min-w-[60px]", isDarkMode ? "text-gray-600" : "text-gray-400")}>Service:</span>
+            <span className={cn("font-bold min-w-[60px]", isDarkMode ? "text-gray-400" : "text-gray-400")}>Service:</span>
             <span className={cn("font-medium", isDarkMode ? "text-gray-300" : "text-gray-600")}>{item.subCategory}</span>
           </div>
           {item.location && (
             <div className="flex gap-2">
-              <span className={cn("font-bold min-w-[60px]", isDarkMode ? "text-gray-600" : "text-gray-400")}>Loc:</span>
+              <span className={cn("font-bold min-w-[60px]", isDarkMode ? "text-gray-400" : "text-gray-400")}>Loc:</span>
               <div className="flex-1 flex items-start justify-between gap-2">
                 <span className={cn("font-medium leading-snug", isDarkMode ? "text-gray-400" : "text-gray-600")}>{item.location}</span>
                 {item.mapPin && (

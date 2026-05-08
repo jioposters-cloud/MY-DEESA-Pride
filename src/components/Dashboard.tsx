@@ -61,13 +61,15 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     async function loadData() {
       const data = await fetchDirectoryData();
       
-      // Check for deep link
+      // Check for deep link (Gently clear URL without full reload)
       const params = new URLSearchParams(window.location.search);
       const itemName = params.get('item');
       if (itemName) {
         const item = data.find(i => i.name === itemName);
         if (item) {
           setHighlightedItem(item);
+          const newUrl = window.location.pathname + window.location.hash;
+          window.history.replaceState(window.history.state, '', newUrl);
         }
       }
 

@@ -17,14 +17,21 @@ export default function App() {
       allowLocalhostAsSecureOrigin: true,
     });
 
-    // Initialize history state
-    window.history.replaceState({ screen: 'welcome' }, '');
+    // Initialize history state if not present
+    if (!window.history.state) {
+      window.history.replaceState({ screen: 'welcome' }, '');
+    } else if (window.history.state.screen) {
+      setCurrentScreen(window.history.state.screen);
+      setInitialCategory(window.history.state.category || null);
+    }
 
     const handlePopState = (event: PopStateEvent) => {
+      // Check if we have a valid state to navigate to
       if (event.state && event.state.screen) {
         setCurrentScreen(event.state.screen);
         setInitialCategory(event.state.category || null);
-      } else {
+      } else if (window.location.pathname === '/') {
+        // Fallback to welcome only if at root path
         setCurrentScreen('welcome');
         setInitialCategory(null);
       }
@@ -36,9 +43,14 @@ export default function App() {
 
   const navigateTo = (screen: Screen, category?: string) => {
     if (screen === currentScreen && category === initialCategory) return;
-    setCurrentScreen(screen);
-    setInitialCategory(category || null);
-    window.history.pushState({ screen, category }, '');
+    
+    // Use a small delay for smoother transitions on mobile
+    requestAnimationFrame(() => {
+      setCurrentScreen(screen);
+      setInitialCategory(category || null);
+      window.history.pushState({ screen, category }, '');
+      window.scrollTo(0, 0);
+    });
   };
 
   const goBack = () => {

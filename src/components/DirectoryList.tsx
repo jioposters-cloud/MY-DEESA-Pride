@@ -77,7 +77,10 @@ const DarkCSSTricksCard: React.FC<{
 
         <div className="space-y-4 flex-1">
           <div className="space-y-2">
-            <span className="text-[11px] font-black uppercase tracking-[0.2em] font-mono" style={{ color }}>{item.category}</span>
+            <div className="flex flex-col gap-1">
+              <span className="text-[11px] font-black uppercase tracking-[0.2em] font-mono" style={{ color }}>{item.category}</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">Sub: {item.subCategory}</span>
+            </div>
             <p className="text-[13px] text-gray-400 leading-relaxed font-medium tracking-tight line-clamp-4 italic border-l-2 border-white/5 pl-4">
               " {item.info || item.tag || item.location || "Local service provider dedicated to quality and excellence in Deesa. Contact for more details."} "
             </p>
@@ -145,13 +148,16 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
       setLoading(true);
       const data = await fetchDirectoryData();
       
-      // Check for deep link
+      // Check for deep link (Clean up URL search params more safely)
       const params = new URLSearchParams(window.location.search);
       const itemName = params.get('item');
       if (itemName) {
         const item = data.find(i => i.name === itemName);
         if (item) {
           setHighlightedItem(item);
+          // Gently clear the URL without a full reload
+          const newUrl = window.location.pathname + window.location.hash;
+          window.history.replaceState(window.history.state, '', newUrl);
         }
       }
       
@@ -189,24 +195,33 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
   const categoriesRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-scroll categories
+  // Auto-scroll categories (Optimized for mobile)
   useEffect(() => {
     const el = categoriesRef.current;
     if (!el || isPaused || categories.length <= 1) return;
 
     let frameId: number;
-    const scroll = () => {
-      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
-        el.scrollLeft = 0;
-      } else {
-        el.scrollLeft += 0.5;
+    let lastTime = 0;
+    
+    const scroll = (time: number) => {
+      if (!lastTime) lastTime = time;
+      const delta = time - lastTime;
+      
+      // Only update every 30ms (~30fps) instead of 60fps to save battery/memory on mobile
+      if (delta > 32) {
+        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 1) {
+          el.scrollLeft = 0;
+        } else {
+          el.scrollLeft += 0.5;
+        }
+        lastTime = time;
       }
       frameId = requestAnimationFrame(scroll);
     };
 
     const timeoutId = setTimeout(() => {
       frameId = requestAnimationFrame(scroll);
-    }, 2000); // Start after 2s
+    }, 3000); // Start after 3s to allow initial load to settle
 
     return () => {
       clearTimeout(timeoutId);
@@ -376,7 +391,7 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
                     "text-[10px] font-bold text-center max-w-[80px] leading-tight uppercase tracking-tighter transition-colors",
                     activeCategory === cat 
                       ? (isDarkMode ? "text-white" : "text-gray-900") 
-                      : (isDarkMode ? "text-gray-500" : "text-gray-500")
+                      : (isDarkMode ? "text-gray-400" : "text-gray-500")
                   )}>{cat}</span>
                 </button>
               ))}
@@ -400,7 +415,7 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
                     "px-4 py-2 rounded-full text-xs font-bold transition-all border",
                     activeSubCategory === sub 
                       ? (isDarkMode ? "bg-red-500 text-white border-red-500 shadow-lg shadow-red-500/20" : "bg-[#2d3436] text-white border-[#2d3436]")
-                      : (isDarkMode ? "bg-[#1a1a1a] text-gray-400 border-white/5 hover:border-white/20" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300")
+                      : (isDarkMode ? "bg-[#1a1a1a] text-gray-300 border-white/5 hover:border-white/20" : "bg-white text-gray-600 border-gray-200 hover:border-gray-300")
                   )}
                 >
                   {sub}
