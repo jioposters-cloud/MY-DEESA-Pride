@@ -171,6 +171,7 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
         if (screen === 'food') return cat.includes('food') || cat.includes('restaurant');
         if (screen === 'realestate') return cat.includes('real estate schemes');
         if (screen === 'events') return cat.includes('events');
+        if (screen === 'new-to-try') return cat.includes('new to try in deesa');
         return true;
       });
       
@@ -277,6 +278,7 @@ export default function DirectoryList({ screen, onBack, initialCategory, onCateg
                 screen === 'phonebook' ? 'Phonebook - MyDeesa App Diary' : 
                 screen === 'realestate' ? 'Real Estate Schemes' :
                 screen === 'events' ? 'Events of Deesa' :
+                screen === 'new-to-try' ? 'New to Try in DEESA' :
                 screen.charAt(0).toUpperCase() + screen.slice(1);
 
   return (

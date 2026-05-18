@@ -71,6 +71,7 @@ export default function App() {
       case 'realestate':
       case 'events':
       case 'phonebook-dark':
+      case 'new-to-try':
         return (
           <DirectoryList 
             screen={currentScreen === 'phonebook-dark' ? 'phonebook' : currentScreen} 

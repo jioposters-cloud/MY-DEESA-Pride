@@ -4,7 +4,7 @@ import {
   Search, Menu, SlidersHorizontal, Contact, Key, Building2, 
   Briefcase, Utensils, Compass, Cloud, Tractor, 
   ShoppingBag, Home, LayoutGrid, User, Plus, X, Globe, Phone, Mail, Waypoints, Calendar,
-  Gamepad2, Bell, Info, Moon
+  Gamepad2, Bell, Info, Moon, Sparkles
 } from 'lucide-react';
 import { DirectoryItem, Screen } from '../types';
 import { fetchDirectoryData } from '../services/sheetService';
@@ -101,13 +101,14 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     { id: 'jobs', name: 'Job Vacancies', icon: Briefcase, color: 'bg-green-50 text-emerald-700', screen: 'jobs' },
     { id: 'food', name: 'Food', icon: Utensils, color: 'bg-orange-50 text-orange-700', screen: 'food' },
     { id: 'explore', name: 'Explore City', icon: Compass, color: 'bg-purple-50 text-purple-700', screen: 'explore' },
-    { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
+    { id: 'new-to-try', name: 'New to Try', icon: Sparkles, color: 'bg-orange-50 text-orange-600', screen: 'new-to-try' },
     { id: 'apmc', name: 'APMC', icon: Tractor, color: 'bg-amber-50 text-amber-700', screen: 'apmc' },
     { id: 'shopping', name: 'Shopping', icon: ShoppingBag, color: 'bg-rose-50 text-rose-700', screen: 'shopping' },
     { id: 'bridge', name: 'Deesa Bridge Corridor', icon: BridgeIcon, color: 'bg-cyan-50 text-cyan-700', url: 'https://mydeesa-sdg.jioposters.workers.dev/' },
     { id: 'events', name: 'Events', icon: Calendar, color: 'bg-pink-50 text-pink-700', screen: 'events' },
     { id: 'game', name: 'Games', icon: Gamepad2, color: 'bg-violet-50 text-violet-700', screen: 'game' },
     { id: 'phonebook-dark', name: 'Dark Phonebook', icon: Moon, color: 'bg-slate-900 text-white', screen: 'phonebook-dark' },
+    { id: 'weather', name: 'Weather', icon: Cloud, color: 'bg-sky-50 text-sky-700', screen: 'weather' },
     { id: 'add-business', name: 'Add Business', icon: Building2, color: 'bg-white text-[#b71700] ring-2 ring-[#b71700]/5', url: 'https://forms.gle/qq23MUr12Gn3kqPAA' },
   ];
 
